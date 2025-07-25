@@ -1,9 +1,11 @@
 ﻿@page "/members/create"
+@using MbfApp.Dtos.Member
+@using MbfApp.Services.MemberServices
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.EntityFrameworkCore
 @using MbfApp.Data.Entities
 
-@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject IMemberService MemberService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Create</PageTitle>
@@ -55,17 +57,7 @@
                 <InputText id="nominee" @bind-Value="Member.Nominee" class="form-control" /> 
                 <ValidationMessage For="() => Member.Nominee" class="text-danger" /> 
             </div>       
-            <div class="mb-3">
-                <label for="locationid" class="form-label">Location:</label> 
-                <InputSelect id="locationid" @bind-Value="Member.LocationId" class="form-control">
-                    <option value="">-- Select Location --</option>
-                    @foreach (var location in Locations)
-                    {
-                        <option value="@location.Id">@location.Name</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => Member.LocationId" class="text-danger" /> 
-            </div>        
+          
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -77,22 +69,16 @@
 
 @code {
     [SupplyParameterFromForm]
-    private Member Member { get; set; } = new();
-
-    private List<Location> Locations = new();
+    private MemberRequestDto Member { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        Locations = await context.Locations.OrderBy(l => l.Name).ToListAsync();
-    }
-
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+        //using var context = DbFactory.CreateDbContext();
+       // Locations = await context.Locations.OrderBy(l => l.Name).ToListAsync();
+    }    
     private async Task AddMember()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Members.Add(Member);
-        await context.SaveChangesAsync();
+        await MemberService.CreateNewMember(Member);
         NavigationManager.NavigateTo("/members");
     }
 }

@@ -1,6 +1,5 @@
 using MbfApp.Components;
 using MbfApp.Extensions;
-using MbfApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +7,7 @@ builder.Services.AddDbService(builder.Configuration);
 
 builder.Services.AddAppIdentity();
 
-builder.AddApplicationServices();
+builder.Services.AddAppServices();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -32,5 +31,5 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
+app.MapAdditionalIdentityEndpoints();
 app.Run();
