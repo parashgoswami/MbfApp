@@ -1,0 +1,98 @@
+﻿@page "/members/create"
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@using MbfApp.Data.Entities
+
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h2>Create Member</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Member" OnValidSubmit="AddMember" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="employeeno" class="form-label">EmployeeNo:</label> 
+                <InputText id="employeeno" @bind-Value="Member.EmployeeNo" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Member.EmployeeNo" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="firstname" class="form-label">FirstName:</label> 
+                <InputText id="firstname" @bind-Value="Member.FirstName" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Member.FirstName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lastname" class="form-label">LastName:</label> 
+                <InputText id="lastname" @bind-Value="Member.LastName" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Member.LastName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="Member.Email" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Member.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone:</label> 
+                <InputText id="phone" @bind-Value="Member.Phone" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Member.Phone" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="joiningdate" class="form-label">JoiningDate:</label> 
+                <InputDate id="joiningdate" @bind-Value="Member.JoiningDate" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Member.JoiningDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="share" class="form-label">Share:</label> 
+                <InputNumber id="share" @bind-Value="Member.Share" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Member.Share" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="nominee" class="form-label">Nominee:</label> 
+                <InputText id="nominee" @bind-Value="Member.Nominee" class="form-control" /> 
+                <ValidationMessage For="() => Member.Nominee" class="text-danger" /> 
+            </div>       
+            <div class="mb-3">
+                <label for="locationid" class="form-label">Location:</label> 
+                <InputSelect id="locationid" @bind-Value="Member.LocationId" class="form-control">
+                    <option value="">-- Select Location --</option>
+                    @foreach (var location in Locations)
+                    {
+                        <option value="@location.Id">@location.Name</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Member.LocationId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/members">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Member Member { get; set; } = new();
+
+    private List<Location> Locations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Locations = await context.Locations.OrderBy(l => l.Name).ToListAsync();
+    }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMember()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Members.Add(Member);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/members");
+    }
+}

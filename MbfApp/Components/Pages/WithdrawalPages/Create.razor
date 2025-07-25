@@ -1,0 +1,54 @@
+﻿@page "/withdrawals/create"
+@using Microsoft.EntityFrameworkCore
+@using MbfApp.Data.Entities
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Withdrawal</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Withdrawal" OnValidSubmit="AddWithdrawal" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+     
+            <div class="mb-3">
+                <label for="appliedamt" class="form-label">AppliedAmt:</label> 
+                <InputNumber id="appliedamt" @bind-Value="Withdrawal.AppliedAmt" class="form-control" /> 
+                <ValidationMessage For="() => Withdrawal.AppliedAmt" class="text-danger" /> 
+            </div>                   
+            <div class="mb-3">
+                <label for="remarks" class="form-label">Remarks:</label> 
+                <InputText id="remarks" @bind-Value="Withdrawal.Remarks" class="form-control" /> 
+                <ValidationMessage For="() => Withdrawal.Remarks" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/withdrawals">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Withdrawal Withdrawal { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddWithdrawal()
+    {
+        Withdrawal.MemberId = 1;
+        Withdrawal.Status = WithdrawalStatus.NEW;
+        Withdrawal.ApplicationDate = DateTime.Now;
+
+        using var context = DbFactory.CreateDbContext();
+        context.Withdrawals.Add(Withdrawal);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/withdrawals");
+    }
+}

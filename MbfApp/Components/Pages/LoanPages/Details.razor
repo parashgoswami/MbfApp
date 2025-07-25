@@ -1,0 +1,61 @@
+﻿@page "/loans/details"
+@using Microsoft.EntityFrameworkCore
+@using MbfApp.Data.Entities
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Loan</h2>
+    <hr />
+    @if (loan is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">ApplicationDate</dt>
+            <dd class="col-sm-10">@loan.ApplicationDate.ToString("dd-MM-yyyy")</dd>
+            <dt class="col-sm-2">AppliedAmt</dt>
+            <dd class="col-sm-10">@loan.AppliedAmt</dd>
+            <dt class="col-sm-2">SanctionedAmt</dt>
+            <dd class="col-sm-10">@loan.SanctionedAmt</dd>
+            <dt class="col-sm-2">SanctionDate</dt>
+            <dd class="col-sm-10">@loan.SanctionDate?.ToString("dd-MM-yyyy")</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@loan.Status</dd>
+            <dt class="col-sm-2">Remarks</dt>
+            <dd class="col-sm-10">@loan.Remarks</dd>
+            <dt class="col-sm-2">Member</dt>
+            <dd class="col-sm-10">@loan.Member?.EmployeeNo</dd>
+        </dl>
+        <div>
+            <a href="@($"/loans/edit?id={loan.Id}")">Edit</a> |
+            <a href="@($"/loans")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Loan? loan;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        loan = await context.Loans
+            .Include(m => m.Member)
+            .FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (loan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,79 @@
+﻿@page "/withdrawals/delete"
+@using Microsoft.EntityFrameworkCore
+@using MbfApp.Data.Entities
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Withdrawal</h2>
+    <hr />
+    @if (withdrawal is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ApplicationDate</dt>
+            <dd class="col-sm-10">@withdrawal.ApplicationDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AppliedAmt</dt>
+            <dd class="col-sm-10">@withdrawal.AppliedAmt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">SanctionedAmt</dt>
+            <dd class="col-sm-10">@withdrawal.SanctionedAmt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">SanctionDate</dt>
+            <dd class="col-sm-10">@withdrawal.SanctionDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@withdrawal.Status</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">MemberId</dt>
+            <dd class="col-sm-10">@withdrawal.MemberId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Remarks</dt>
+            <dd class="col-sm-10">@withdrawal.Remarks</dd>
+        </dl>
+        <EditForm method="post" Model="withdrawal" OnValidSubmit="DeleteWithdrawal" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(withdrawal is null)">Delete</button> |
+            <a href="/withdrawals">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Withdrawal? withdrawal;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        withdrawal = await context.Withdrawals.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (withdrawal is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteWithdrawal()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Withdrawals.Remove(withdrawal!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/withdrawals");
+    }
+}

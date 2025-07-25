@@ -1,0 +1,36 @@
+﻿@page "/accountcodes"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MbfApp.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Account Codes</h1>
+
+<p>
+    <a href="accountcodes/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.AccountCodes">
+    <PropertyColumn Property="accountcode => accountcode.Code" />
+    <PropertyColumn Property="accountcode => accountcode.Description" />
+
+    <TemplateColumn Context="accountcode">
+        <a href="@($"accountcodes/edit?id={accountcode.Id}")">Edit</a> |
+        <a href="@($"accountcodes/details?id={accountcode.Id}")">Details</a> |
+        <a href="@($"accountcodes/delete?id={accountcode.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

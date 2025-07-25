@@ -1,0 +1,41 @@
+﻿@page "/withdrawals"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MbfApp.Data.Entities
+@using MbfApp.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="withdrawals/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Withdrawals">
+    <PropertyColumn Property="withdrawal => withdrawal.ApplicationDate" Format="dd-MM-yyyy" />
+    <PropertyColumn Property="withdrawal => withdrawal.AppliedAmt" />
+    <PropertyColumn Property="withdrawal => withdrawal.SanctionedAmt" />
+    <TemplateColumn Context="withdrawal" Title="Status">
+        @withdrawal.Status.ToString()
+    </TemplateColumn>
+
+    <TemplateColumn Context="withdrawal">
+        <a href="@($"withdrawals/edit?id={withdrawal.Id}")">Edit</a> |
+        <a href="@($"withdrawals/details?id={withdrawal.Id}")">Details</a> |
+        <a href="@($"withdrawals/delete?id={withdrawal.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,97 @@
+﻿@page "/loans/edit"
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@using MbfApp.Data.Entities
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Loan</h2>
+<hr />
+@if (Loan is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Loan" OnValidSubmit="UpdateLoan" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Loan.Id" value="@Loan.Id" />
+               
+                <div class="mb-3">
+                    <label for="appliedamt" class="form-label">AppliedAmt:</label>
+                    <InputNumber id="appliedamt" @bind-Value="Loan.AppliedAmt" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Loan.AppliedAmt" class="text-danger" />
+                </div>
+               
+                <div class="mb-3">
+                    <label for="remarks" class="form-label">Remarks:</label>
+                    <InputText id="remarks" @bind-Value="Loan.Remarks" class="form-control" />
+                    <ValidationMessage For="() => Loan.Remarks" class="text-danger" />
+                </div>               
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/loans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Loan? Loan { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Loan ??= await context.Loans.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Loan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateLoan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Loan!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!LoanExists(Loan!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/loans");
+    }
+
+    private bool LoanExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Loans.Any(e => e.Id == id);
+    }
+}

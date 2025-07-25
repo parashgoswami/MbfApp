@@ -1,0 +1,43 @@
+﻿@page "/locations/create"
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Location</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Location" OnValidSubmit="AddLocation" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="nmae" class="form-label">Location:</label> 
+                <InputText id="name" @bind-Value="Location.Name" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Location.Name" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/locations">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Location Location { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddLocation()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Locations.Add(Location);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/locations");
+    }
+}

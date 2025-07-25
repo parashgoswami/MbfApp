@@ -1,0 +1,94 @@
+﻿@page "/accountcodes/edit"
+@using MbfApp.Data.Entities
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit Account Code</h1>
+
+<hr />
+@if (AccountCode is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="AccountCode" OnValidSubmit="UpdateAccountCode" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="AccountCode.Id" value="@AccountCode.Id" />
+                <div class="mb-3">
+                    <label for="code" class="form-label">Code:</label>
+                    <InputText id="code" @bind-Value="AccountCode.Code" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => AccountCode.Code" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="AccountCode.Description" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => AccountCode.Description" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/accountcodes">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private AccountCode? AccountCode { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        AccountCode ??= await context.AccountCodes.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (AccountCode is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateAccountCode()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(AccountCode!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AccountCodeExists(AccountCode!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/accountcodes");
+    }
+
+    private bool AccountCodeExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.AccountCodes.Any(e => e.Id == id);
+    }
+}

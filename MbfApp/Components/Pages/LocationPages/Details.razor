@@ -1,0 +1,46 @@
+﻿@page "/locations/details"
+@using MbfApp.Data.Entities
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Location</h2>
+    <hr />
+    @if (location is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nmae</dt>
+            <dd class="col-sm-10">@location.Name</dd>
+        </dl>
+        <div>
+            <a href="@($"/locations/edit?id={location.Id}")">Edit</a> |
+            <a href="@($"/locations")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Location? location;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        location = await context.Locations.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (location is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

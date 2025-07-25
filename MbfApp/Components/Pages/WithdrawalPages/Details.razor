@@ -1,0 +1,60 @@
+﻿@page "/withdrawals/details"
+@using Microsoft.EntityFrameworkCore
+@using MbfApp.Data.Entities
+@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Withdrawal</h2>
+    <hr />
+    @if (withdrawal is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ApplicationDate</dt>
+            <dd class="col-sm-10">@withdrawal.ApplicationDate.ToString("dd-MM-yyyy")</dd>
+            <dt class="col-sm-2">AppliedAmt</dt>
+            <dd class="col-sm-10">@withdrawal.AppliedAmt</dd>
+            <dt class="col-sm-2">SanctionedAmt</dt>
+            <dd class="col-sm-10">@withdrawal.SanctionedAmt</dd>
+            <dt class="col-sm-2">SanctionDate</dt>
+            <dd class="col-sm-10">@withdrawal.SanctionDate?.ToString("dd-MM-yyyy")</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@withdrawal.Status</dd>
+            <dt class="col-sm-2">MemberId</dt>
+            <dd class="col-sm-10">@withdrawal.Member?.EmployeeNo</dd>
+            <dt class="col-sm-2">Remarks</dt>
+            <dd class="col-sm-10">@withdrawal.Remarks</dd>
+        </dl>
+        <div>
+            <a href="@($"/withdrawals/edit?id={withdrawal.Id}")">Edit</a> |
+            <a href="@($"/withdrawals")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Withdrawal? withdrawal;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        withdrawal = await context.Withdrawals
+            .Include(m => m.Member)
+            .FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (withdrawal is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

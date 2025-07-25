@@ -1,0 +1,48 @@
+﻿@page "/loans/create"
+@using MbfApp.Dtos.Loan
+@using MbfApp.Services.LoanServices
+
+@inject ILoanService LoanService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h2>Create New Loan Request</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="LoanRequest" OnValidSubmit="AddLoan" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+                
+            <div class="mb-3">
+                <label for="appliedamt" class="form-label">Applied Amount:</label> 
+                <InputNumber id="appliedamt" @bind-Value="LoanRequest.AppliedAmt" class="form-control" aria-required="true" />
+                <ValidationMessage For="() => LoanRequest.AppliedAmt" class="text-danger" />
+            </div>                   
+           
+            <div class="mb-3">
+                <label for="remarks" class="form-label">Remarks:</label> 
+                <InputText id="remarks" @bind-Value="LoanRequest.Remarks" class="form-control" />
+                <ValidationMessage For="() => LoanRequest.Remarks" class="text-danger" />
+            </div>       
+               
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/loans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private LoanRequestDto LoanRequest { get; set; } = new();
+   
+    private async Task AddLoan()
+    {      
+        await LoanService.CreateNewLoan(LoanRequest);
+        NavigationManager.NavigateTo("/loans");
+    }
+}
