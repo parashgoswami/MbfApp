@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MbfApp.Data.Entities;
+﻿using MbfApp.Data.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace MbfApp.Data;
 
-public class AppDbContext : DbContext
-{
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options)
-    {
-    }
-
+public class AppDbContext(DbContextOptions<AppDbContext> options) 
+    : IdentityDbContext<ApplicationUser>(options)
+{  
     public DbSet<Member> Members { get; set; } = default!;
     public DbSet<Location> Locations { get; set; } = default!;
     public DbSet<AccountCode> AccountCodes { get; set; } = default!;

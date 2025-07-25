@@ -1,16 +1,12 @@
 using MbfApp.Components;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using MbfApp.Data;
+using MbfApp.Extensions;
 using MbfApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-           
-builder.Services.AddQuickGridEntityFrameworkAdapter();
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddDbService(builder.Configuration);
+
+builder.Services.AddAppIdentity();
 
 builder.AddApplicationServices();
 
@@ -30,7 +26,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 
 app.UseAntiforgery();
 
