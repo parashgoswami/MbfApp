@@ -1,7 +1,52 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<div class="container-fluid">
+    <h1 class="mt-4 mb-4" style="color: #10B981;">Welcome to the MBF Portal!</h1>
+    <p class="lead mb-4">Manage MBF portal from Admin dashboard</p>
 
-<h1>Hello, world!</h1>
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-line stat-icon"></i>
+                    <div class="stat-value">1,234</div>
+                    <div class="stat-label">Deposit</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    
+                    <i class="bi bi-people-fill stat-icon"></i>
+                    <div class="stat-value">567</div>
+                    <div class="stat-label">Members</div>
+                    <NavLink href="members" class="stretched-link"></NavLink>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-12 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-dollar-sign stat-icon"></i>
+                    <div class="stat-value">$8,910</div>
+                    <div class="stat-label">Loan</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-Welcome to your new app.
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">More Content Here</h5>
+            <p class="card-text">Feel free to add more sections and components to expand your application.</p>
+            <a href="#" class="btn btn-outline" style="color: #10B981; border-color: #10B981;">Learn More</a>
+        </div>
+    </div>
+</div>
+<style>
+    .card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        cursor: pointer;
+    }
+</style>

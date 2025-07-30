@@ -22,6 +22,7 @@ public static class IdentityServiceExtensions
         .AddIdentityCookies();
 
         services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+            .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();

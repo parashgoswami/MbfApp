@@ -1,21 +1,227 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Inter', sans-serif; 
+    background-color: #f8f9fa;
+    font-size: 1rem; 
+    color: #212529; 
 }
 
-a, .btn-link {
+h1:focus {
+    outline: none;
+}
+
+body {
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh; 
+}
+
+#wrapper {
+    display: flex;
+    flex: 1; 
+    margin-top: 72px; 
+}
+
+#sidebar-wrapper {
+    min-width: 250px;
+    max-width: 250px;
+    background-color: #ffffff; 
+    color: #343a40; 
+    transition: margin 0.25s ease-out;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+    #sidebar-wrapper .sidebar-heading {
+        padding: 1.5rem 1.25rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(0,0,0,0.1); /* Adjusted border color */
+    }
+
+    #sidebar-wrapper .list-group {
+        width: 100%;
+    }
+
+    #sidebar-wrapper .list-group-item {
+        background-color: transparent;
+        color: #495057; /* Darker text for list items */
+        border: none;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        border-radius: 8px; /* Rounded corners */
+        margin: 2px 5px; /* Decreased vertical margin from 5px to 3px */
+    }
+
+        #sidebar-wrapper .list-group-item:hover {
+            /*background-color: #e9ecef;*/ /* Lighter hover background */
+            color: #10B981; /* Darker text on hover */
+        }
+
+        #sidebar-wrapper .list-group-item.active {
+            background-color: transparent; /* Keep background transparent */
+            color: #10B981; /* Primary color #10B981 */
+        }
+
+            #sidebar-wrapper .list-group-item.active i {
+                color: #10B981; /* Ensure icon also turns #10B981 */
+            }
+
+        #sidebar-wrapper .list-group-item i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            color: inherit; /* Inherit color from parent for non-active state */
+        }
+
+#page-content-wrapper {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+/* Toggled sidebar */
+body.toggled #wrapper #sidebar-wrapper {
+    margin-left: -250px;
+}
+
+@media (min-width: 768px) {
+    body.toggled #wrapper #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* Top Navbar Styling */
+.navbar {
+    background-color: #ffffff; /* White background */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    /* Removed border-bottom-left-radius and border-bottom-right-radius */
+    border-radius: 0; /* Ensures no rounded corners */
+    position: fixed; /* Made navbar fixed */
+    top: 0; /* Position at the top */
+    left: 0; /* Position at the left */
+    width: 100%; /* Ensure it covers the entire screen width */
+    z-index: 1030; /* Ensure it stays on top */
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    font-weight: 300; /* Made font thinner */
+    color: #343a40 !important;
+}
+
+    .navbar-brand img {
+        height: 30px;
+        margin-right: 10px;
+        border-radius: 5px;
+    }
+
+.login-icon {
+    font-size: 1.5rem; /* Adjust icon size */
+    color: #10B981; /* Primary color #10B981 */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+    .login-icon:hover {
+        color: #0d966a; /* Darker shade for hover */
+    }
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.stat-icon {
+    font-size: 2.5rem; /* Larger icon for stats */
+    margin-bottom: 10px;
+    color: #10B981; /* Primary color for stat icons */
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #343a40;
+}
+
+.stat-label {
+    color: #495057; /* Made stat label font color darker */
+    font-size: 0.9rem;
+}
+/* Hero section font adjustments */
+#page-content-wrapper h1 {
+    font-size: 1.8rem; /* Smaller heading font size */
+}
+
+#page-content-wrapper .lead {
+    font-size: 0.9rem; /* Slightly increased lead paragraph font size */
+}
+/* Footer Styling */
+.footer {
+    background-color: #ffffff; /* Light background for footer */
+    padding: 20px 0;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+    /* Removed border-top-left-radius and border-top-right-radius */
+    border-radius: 0; /* Ensures no rounded corners */
+    text-align: center;
+    color: #495057; /* Darker text color */
+    margin-top: auto; /* Push footer to the bottom */
+}
+
+    .footer a {
+        color: #10B981; /* Primary color for links in footer */
+        text-decoration: none;
+    }
+
+        .footer a:hover {
+            color: #0d966a; /* Darker shade on hover */
+        }
+
+
+
+input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: #198754 !important;
+}
+.quickgrid th {
+    background-color: var(--bs-light);
+    text-align: left;
+}
+table thead th {
+    border-bottom: 2px solid #dee2e6; /* or your desired color */
+}
+.table tr {
+    height: 40px; /* or whatever height you want */
+}
+.table td {
+    padding-top: 1rem;   
+    vertical-align: middle; /* optional: centers content vertically */
+}
+tr:last-child td {
+    border-bottom: none !important; 
+}
+/*table tbody td {
+    border-bottom: none !important;
+}*/
+/*a, .btn-link {
     color: #006bb7;
 }
-
-.btn-primary {
+*/
+/*.btn-primary {
     color: #fff;
     background-color: #1b6ec2;
     border-color: #1861ac;
 }
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+*/
+/*.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}*/
+.table{
+    font-size:14px;
 }
-
 .content {
     padding-top: 1.1rem;
 }

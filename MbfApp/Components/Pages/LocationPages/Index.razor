@@ -7,19 +7,22 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Locations</h1>
-
+<h4>Locations</h4>
+<hr />
 <p>
-    <a href="locations/create">Create New</a>
+    <a href="locations/create" class="btn btn-success btn-sm">
+        <i class="bi bi-plus-lg"></i>
+        Create New
+    </a>
 </p>
 
-<QuickGrid Class="table" Items="context.Locations">
+<QuickGrid Class="table table-bordered" Items="context.Locations">
     <PropertyColumn Property="location => location.Name" />
 
-    <TemplateColumn Context="location">
-        <a href="@($"locations/edit?id={location.Id}")">Edit</a> |
-        <a href="@($"locations/details?id={location.Id}")">Details</a> |
-        <a href="@($"locations/delete?id={location.Id}")">Delete</a>
+    <TemplateColumn Context="location" Title="Action">
+        <a href="@($"locations/edit?id={location.Id}")" class="link-success icon-link icon-link-hover"><i class="bi bi-pencil"></i></a> |
+        <a href="@($"locations/details?id={location.Id}")" class="link-success icon-link icon-link-hover"><i class="bi bi-binoculars"></i></a> |
+        <a href="@($"locations/delete?id={location.Id}")" class="link-danger icon-link icon-link-hover"><i class="bi bi-trash"></i></a>
     </TemplateColumn>
 </QuickGrid>
 

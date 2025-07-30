@@ -14,11 +14,13 @@ public class MemberService : IMemberService
 {
     private AppDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public MemberService(UserManager<ApplicationUser> userManager, AppDbContext context)
+    public MemberService(UserManager<ApplicationUser> userManager, AppDbContext context, RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
         _context = context;
+        _roleManager = roleManager;
     }
 
     public async Task CreateNewMember(MemberRequestDto request)
@@ -47,6 +49,10 @@ public class MemberService : IMemberService
         };
 
         var result = await _userManager.CreateAsync(appUser, "Welcome@123");
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(appUser, "Member");           
+        }
         if (!result.Succeeded)
         {
             // Rollback the member if needed

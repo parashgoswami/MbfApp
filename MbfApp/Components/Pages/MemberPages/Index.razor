@@ -6,27 +6,34 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Members</PageTitle>
 
-<h1>Locations</h1>
-
+<h5>Members</h5>
+<hr />
 <p>
-    <a href="members/create">Create New</a>
+    <a href="members/create" class="btn btn-success btn-sm">
+        <i class="bi bi-plus-lg"></i>
+        Create New
+    </a>
 </p>
-
-<QuickGrid Class="table" Items="context.Members">
-    <PropertyColumn Property="member => member.EmployeeNo" />
-    <PropertyColumn Property="member => member.FirstName" />
-    <PropertyColumn Property="member => member.LastName" />
+<div class="card rounded-2 overflow-hidden">
+    <div class="card-body p-0 m-0">
+<QuickGrid Class="table " Items="context.Members">
+    <PropertyColumn Property="member => member.EmployeeNo" Title="Employee No" />
+    <TemplateColumn Title="Name" Context="member">
+        @($"{member.FirstName} {member.LastName}")
+    </TemplateColumn>
     <PropertyColumn Property="member => member.Email" />
     <PropertyColumn Property="member => member.Phone" />
 
-    <TemplateColumn Context="member">
-        <a href="@($"members/edit?id={member.Id}")">Edit</a> |
-        <a href="@($"members/details?id={member.Id}")">Details</a> |
-        <a href="@($"members/delete?id={member.Id}")">Delete</a>
+    <TemplateColumn Context="member" Title="Action">
+        <a href="@($"members/edit?id={member.Id}")" class="link-success icon-link icon-link-hover"><i class="bi bi-pencil"></i></a>  |
+        <a href="@($"members/details?id={member.Id}")" class="link-secondary icon-link icon-link-hover"><i class="bi bi-binoculars"></i></a>  |
+        <a href="@($"members/delete?id={member.Id}")" class="link-danger icon-link icon-link-hover"><i class="bi bi-trash"></i></a>
     </TemplateColumn>
 </QuickGrid>
+</div>
+</div>
 
 @code {
     private AppDbContext context = default!;

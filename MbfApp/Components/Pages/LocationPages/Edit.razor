@@ -5,9 +5,7 @@
 
 <PageTitle>Edit</PageTitle>
 
-<h1>Edit</h1>
-
-<h2>Location</h2>
+<h4>Edit Location</h4>
 <hr />
 @if (Location is null)
 {
@@ -23,17 +21,17 @@ else
                 <input type="hidden" name="Location.Id" value="@Location.Id" />
                 <div class="mb-3">
                     <label for="nmae" class="form-label">Location:</label>
-                    <InputText id="nmae" @bind-Value="Location.Name" class="form-control" aria-required="true"/>
+                    <InputText id="nmae" @bind-Value="Location.Name" class="form-control form-control-sm" aria-required="true" />
                     <ValidationMessage For="() => Location.Name" class="text-danger" />
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-success btn-sm">Save</button>
             </EditForm>
         </div>
     </div>
 }
 
 <div>
-    <a href="/locations">Back to List</a>
+    <a class="btn btn-secondary btn-sm mt-2" href="/locations">Back to List</a>
 </div>
 
 @code {
