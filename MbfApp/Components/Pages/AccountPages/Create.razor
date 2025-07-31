@@ -1,47 +1,50 @@
 ﻿@page "/accountcodes/create"
-
-@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+@using MbfApp.Dtos.AccountCodes
+@using MbfApp.Services.AccountCodeService
+@using MbfApp.Services.MemberServices
 @inject NavigationManager NavigationManager
+@inject IAccountCodeService AccountCodeService
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create Account Code</PageTitle>
 
-<h1>Create Account Code</h1>
-
-<hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm method="post" Model="AccountCode" OnValidSubmit="AddAccountCode" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
+        <div class="card rounded-2 overflow-hidden p-4">
+            <h5>Create Account Code</h5>
+            <hr class="border border-success border-1 opacity-50 py-0">
+        <EditForm method="post" Model="Request" OnValidSubmit="AddAccountCode" FormName="create" Enhance>
+            <DataAnnotationsValidator />          
             <div class="mb-3">
-                <label for="code" class="form-label">Code:</label> 
-                <InputText id="code" @bind-Value="AccountCode.Code" class="form-control" aria-required="true"/> 
-                <ValidationMessage For="() => AccountCode.Code" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="description" class="form-label">Description:</label> 
-                <InputText id="description" @bind-Value="AccountCode.Description" class="form-control" aria-required="true"/> 
-                <ValidationMessage For="() => AccountCode.Description" class="text-danger" /> 
-            </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
+                <label for="description" class="form-label small">Account Code:</label>
+                    <InputText id="description" @bind-Value="Request.Name" class="form-control form-control-sm" aria-required="true" />
+                    <ValidationMessage For="() => Request.Name" class="text-danger" /> 
+            </div>
+                <div class="mb-3">
+                    <label for="type" class="form-label small">Account Type</label>
+                    <InputSelect id="type" @bind-Value="Request.AccountType" class="form-select form-select-sm">
+                        @foreach (var type in Enum.GetValues<AccountType>())
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </InputSelect>
+                </div>
+                <button type="submit" class="btn btn-success btn-sm mb-2">Create</button>
+                <a href="/accountcodes" class="btn btn-secondary btn-sm mb-2">Back </a>
         </EditForm>
+        </div>
     </div>
 </div>
 
-<div>
-    <a href="/accountcodes">Back to List</a>
-</div>
 
 @code {
     [SupplyParameterFromForm]
-    private AccountCode AccountCode { get; set; } = new();
+    private AccountCodeRequestDto Request { get; set; } = new();
+   
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddAccountCode()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.AccountCodes.Add(AccountCode);
-        await context.SaveChangesAsync();
+        await AccountCodeService.CreateNewAccountCode(Request);
         NavigationManager.NavigateTo("/accountcodes");
     }
 }

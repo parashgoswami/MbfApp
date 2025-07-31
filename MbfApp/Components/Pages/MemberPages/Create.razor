@@ -76,11 +76,6 @@
     [SupplyParameterFromForm]
     private MemberRequestDto Member { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        //using var context = DbFactory.CreateDbContext();
-        // Locations = await context.Locations.OrderBy(l => l.Name).ToListAsync();
-    }
     private async Task AddMember()
     {
         await MemberService.CreateNewMember(Member);

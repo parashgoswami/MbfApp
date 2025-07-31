@@ -17,13 +17,10 @@
         <p><em>Loading...</em></p>
     }
     else {
-        <dl class="row">
-            <dt class="col-sm-2">Code</dt>
-            <dd class="col-sm-10">@accountcode.Code</dd>
-        </dl>
+        
         <dl class="row">
             <dt class="col-sm-2">Description</dt>
-            <dd class="col-sm-10">@accountcode.Description</dd>
+            <dd class="col-sm-10">@accountcode.Name</dd>
         </dl>
         <EditForm method="post" Model="accountcode" OnValidSubmit="DeleteAccountCode" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(accountcode is null)">Delete</button> |

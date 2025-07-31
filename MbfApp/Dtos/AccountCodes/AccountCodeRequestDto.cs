@@ -1,14 +1,12 @@
 ﻿using MbfApp.Data.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace MbfApp.Data.Entities;
+namespace MbfApp.Dtos.AccountCodes;
 
-public class AccountCode
+public class AccountCodeRequestDto
 {
-    public int Id { get; set; }   
     [Required]
     public AccountType AccountType { get; set; }
-    [Required]
-    [StringLength(50)]
+    [Required,StringLength(50)]
     public string Name { get; set; } = string.Empty;
 }
