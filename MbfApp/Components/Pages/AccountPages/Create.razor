@@ -1,24 +1,33 @@
 ﻿@page "/accountcodes/create"
+
 @using MbfApp.Dtos.AccountCodes
 @using MbfApp.Services.AccountCodeService
 @using MbfApp.Services.MemberServices
+
 @inject NavigationManager NavigationManager
 @inject IAccountCodeService AccountCodeService
 
 <PageTitle>Create Account Code</PageTitle>
 
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-center">
+    <div class="col-md-6">
         <div class="card rounded-2 overflow-hidden p-4">
-            <h5>Create Account Code</h5>
-            <hr class="border border-success border-1 opacity-50 py-0">
-        <EditForm method="post" Model="Request" OnValidSubmit="AddAccountCode" FormName="create" Enhance>
-            <DataAnnotationsValidator />          
-            <div class="mb-3">
-                <label for="description" class="form-label small">Account Code:</label>
-                    <InputText id="description" @bind-Value="Request.Name" class="form-control form-control-sm" aria-required="true" />
-                    <ValidationMessage For="() => Request.Name" class="text-danger" /> 
-            </div>
+            <h5 class="mb-0">Create Account Code</h5>
+            <hr class="border-1 border-success opacity-50">
+
+            @if (ErrorMessage is not null) 
+            {
+                <div class="alert alert-danger" role="alert">@ErrorMessage</div>
+            }
+
+            <EditForm method="post" Model="Request" OnValidSubmit="AddAccountCode" FormName="create" Enhance>
+                <DataAnnotationsValidator />
+                <div class="mb-3">
+                    <label for="description" class="form-label small">Account Name</label>
+                    <InputText id="description" @bind-Value="Request.Name" class="form-control form-control-sm"
+                        aria-required="true" />
+                    <ValidationMessage For="() => Request.Name" class="text-danger" />
+                </div>
                 <div class="mb-3">
                     <label for="type" class="form-label small">Account Type</label>
                     <InputSelect id="type" @bind-Value="Request.AccountType" class="form-select form-select-sm">
@@ -30,7 +39,7 @@
                 </div>
                 <button type="submit" class="btn btn-success btn-sm mb-2">Create</button>
                 <a href="/accountcodes" class="btn btn-secondary btn-sm mb-2">Back </a>
-        </EditForm>
+            </EditForm>
         </div>
     </div>
 </div>
@@ -39,12 +48,19 @@
 @code {
     [SupplyParameterFromForm]
     private AccountCodeRequestDto Request { get; set; } = new();
-   
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private string? ErrorMessage;
+
     private async Task AddAccountCode()
     {
-        await AccountCodeService.CreateNewAccountCode(Request);
-        NavigationManager.NavigateTo("/accountcodes");
+        try 
+        {
+            await AccountCodeService.CreateNewAccountCode(Request);
+            NavigationManager.NavigateTo("/accountcodes");
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }

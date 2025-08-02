@@ -1,44 +1,40 @@
 ﻿@page "/accountcodes"
+
 @using MbfApp.Dtos.AccountCodes
 @using MbfApp.Services.AccountCodeService
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
-@using MbfApp.Data
+
 @inject IAccountCodeService AccountCodeService
 
 <PageTitle>Account Codes</PageTitle>
 
 <h5>Chart of Accounts</h5>
-<hr />
+<hr class="border-1 border-success opacity-50"/>
 <p>
     <a href="accountcodes/create" class="btn btn-success btn-sm">
         <i class="bi bi-plus-lg"></i>
         Create New
     </a>
 </p>
+
 <div class="card rounded-2 overflow-hidden">
     <div class="card-body p-0 m-0">
         <QuickGrid Class="table " Items="accountcodes.AsQueryable()">
-            <PropertyColumn Property="accountcode => accountcode.Name"  Title="Account Code"/>
+            <PropertyColumn Property="accountcode => accountcode.Name"  Title="Account Name"/>
             <PropertyColumn Property="accountcode => accountcode.AccountType" Title="Account Type" />         
 
             <TemplateColumn Context="account" Title="Action">
                 <a href="@($"accountcodes/edit?id={account.Id}")" class="link-success icon-link "><i class="bi bi-pencil"></i></a>  |
-                <a href="@($"accountcodes/details?id={account.Id}")" class="link-secondary icon-link"><i class="bi bi-binoculars"></i></a>  |
                 <a href="@($"accountcodes/delete?id={account.Id}")" class="link-danger icon-link"><i class="bi bi-trash"></i></a>
             </TemplateColumn>
         </QuickGrid>
     </div>
 </div>
 
-
-@code {
-    
+@code 
+{    
     private List<AccountCodeResponse> accountcodes = new();
     protected override async Task OnInitializedAsync()
     {
         accountcodes = await AccountCodeService.ListAccountCodes();
-    }
-
-    
+    } 
 }
