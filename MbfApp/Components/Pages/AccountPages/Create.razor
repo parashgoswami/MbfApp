@@ -60,6 +60,7 @@
         }
         catch (InvalidOperationException ex)
         {
+            ErrorMessage = ex.Message;
             Console.WriteLine(ex.Message);
         }
     }
