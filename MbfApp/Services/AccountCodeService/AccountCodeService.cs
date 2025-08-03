@@ -1,6 +1,5 @@
 ﻿using MbfApp.Data;
 using MbfApp.Data.Entities;
-using MbfApp.Data.Enums;
 using MbfApp.Dtos.AccountCodes;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,9 +42,16 @@ public class AccountCodeService : IAccountCodeService
         await _context.SaveChangesAsync();
     }
 
-    public Task DeleteAccountCode(int id)
+    public async Task DeleteAccountCode(int id)
     {
-        throw new NotImplementedException();
+        var accountCode = await _context.AccountCodes.FindAsync(id);
+        if (accountCode == null)
+        {
+            throw new InvalidOperationException("Account code not found.");
+        }
+
+        _context.AccountCodes.Remove(accountCode);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<AccountCodeResponse?> GetAccountCodeAsync(int id)
@@ -63,21 +69,24 @@ public class AccountCodeService : IAccountCodeService
 
     public async Task<List<AccountCodeResponse>> ListAccountCodes()
     {
-          var accountCodes = await _context.AccountCodes
+        var accountCodes = await _context.AccountCodes
             .Select(a => new AccountCodeResponse
             {
                 Id = a.Id,
                 AccountType = a.AccountType,
                 Name = a.Name
             }).ToListAsync();
-            return accountCodes;
+
+        return accountCodes;
     }
 
     public Task UpdateAccountCode(int id, AccountCodeRequestDto request)
     {
-       var accountCode = _context.AccountCodes.FirstOrDefault(a => a.Id == id);
+        var accountCode = _context.AccountCodes.FirstOrDefault(a => a.Id == id);
+
         if (accountCode == null)
-            throw new InvalidOperationException("Account code not found.");
+            throw new InvalidOperationException("Account not found.");
+
         var name = request.Name.Trim();
         if (accountCode.Name.ToLower() != name.ToLower())
         {
@@ -86,9 +95,11 @@ public class AccountCodeService : IAccountCodeService
             if (exists)
                 throw new InvalidOperationException("Account name must be unique.");
         }
+
         accountCode.Name = name;
         accountCode.AccountType = request.AccountType;
         _context.Update(accountCode);
+
         return _context.SaveChangesAsync();
     }
 }
