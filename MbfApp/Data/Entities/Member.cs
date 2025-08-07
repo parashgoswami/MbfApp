@@ -33,7 +33,6 @@ public class Member
     public int Share { get; set; }
     public string? Nominee { get; set; }
 
-    [Required(ErrorMessage="Location is Required")]
     public int LocationId { get; set; }
     public Location? Location { get; set; }
 }

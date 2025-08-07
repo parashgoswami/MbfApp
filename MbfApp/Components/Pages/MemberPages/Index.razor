@@ -1,47 +1,64 @@
 ﻿@page "/members"
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
-@using MbfApp.Data.Entities
-@using MbfApp.Data
-@implements IAsyncDisposable
-@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+
+@using MbfApp.Dtos.Member
+@rendermode InteractiveServer
+@inject IMemberService MemberService
 
 <PageTitle>Members</PageTitle>
 
 <h5>Members</h5>
 <hr />
-<p>
-    <a href="members/create" class="btn btn-success btn-sm">
-        <i class="bi bi-plus-lg"></i>
+<div class="d-flex justify-content-between align-items-center my-3 gap-2">
+    <a href="members/create" class="btn btn-success btn-sm d-flex align-items-center">
+        <i class="bi bi-plus-lg me-1"></i>
         Create New
     </a>
-</p>
+    <InputText @bind-Value="searchTerm" class="form-control w-50" placeholder="Search by employee no or name" />
+</div>
+
 <div class="card rounded-2 overflow-hidden">
     <div class="card-body p-0 m-0">
-<QuickGrid Class="table " Items="context.Members">
-    <PropertyColumn Property="member => member.EmployeeNo" Title="Employee No" />
-    <TemplateColumn Title="Name" Context="member">
-        @($"{member.FirstName} {member.LastName}")
-    </TemplateColumn>
-    <PropertyColumn Property="member => member.Email" />
-    <PropertyColumn Property="member => member.Phone" />
+        <QuickGrid Class="table" ItemsProvider="GetMembers" Pagination="pagination" TGridItem="MemberDto">
+            <PropertyColumn Property="member => member.EmployeeNo" Title="Employee No" />
+            <TemplateColumn Title="Name" Context="member">
+                @($"{member.FirstName} {member.LastName}")
+            </TemplateColumn>
+            <PropertyColumn Property="member => member.Email" />
+            <PropertyColumn Property="member => member.Phone" />
 
-    <TemplateColumn Context="member" Title="Action">
-        <a href="@($"members/edit?id={member.Id}")" class="link-success icon-link icon-link-hover"><i class="bi bi-pencil"></i></a>  |
-        <a href="@($"members/details?id={member.Id}")" class="link-secondary icon-link icon-link-hover"><i class="bi bi-binoculars"></i></a>  |
-        <a href="@($"members/delete?id={member.Id}")" class="link-danger icon-link icon-link-hover"><i class="bi bi-trash"></i></a>
-    </TemplateColumn>
-</QuickGrid>
+            <TemplateColumn Context="member" Title="Action">
+                <a href="@($"members/edit?id={member.Id}")" class="link-success icon-link icon-link-hover"><i
+                        class="bi bi-pencil"></i></a> |
+                <a href="@($"members/details?id={member.Id}")" class="link-secondary icon-link icon-link-hover"><i
+                        class="bi bi-binoculars"></i></a> |
+                <a href="@($"members/delete?id={member.Id}")" class="link-danger icon-link icon-link-hover"><i
+                        class="bi bi-trash"></i></a>
+            </TemplateColumn>
+        </QuickGrid>
+
+        <div class="px-3">
+            <Paginator State="pagination" />
+        </div>
+    </div>
 </div>
-</div>
 
-@code {
-    private AppDbContext context = default!;
-
-    protected override void OnInitialized()
+@code 
+{
+    private string? searchTerm;
+    private static readonly int pageSize = 10;
+    private PaginationState pagination = new PaginationState { ItemsPerPage = pageSize };
+    public async ValueTask<GridItemsProviderResult<MemberDto>> GetMembers(GridItemsProviderRequest<MemberDto> request)
     {
-        context = DbFactory.CreateDbContext();
-    }
+        var result = await MemberService.GetPaginatedListAync(new MemberSearchParameters {
+            PageIndex = pagination.CurrentPageIndex + 1, // index starts at 0
+            PageSize = pageSize,
+            SearchTerm = searchTerm
+        });
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+        return new GridItemsProviderResult<MemberDto>
+        {
+            Items = result.Items.ToList(),
+            TotalItemCount = result.TotalCount
+        };
+    }
 }

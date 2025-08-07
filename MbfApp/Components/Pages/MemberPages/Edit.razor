@@ -1,81 +1,98 @@
 ﻿@page "/members/edit"
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.EntityFrameworkCore
-@using MbfApp.Data.Entities
-@inject IDbContextFactory<MbfApp.Data.AppDbContext> DbFactory
+
+@using MbfApp.Dtos.Locations
+@using MbfApp.Dtos.Member
 @inject NavigationManager NavigationManager
+@inject ILocationService LocationService
+@inject IMemberService MemberService
 
-<PageTitle>Edit</PageTitle>
+@attribute [StreamRendering]
 
+<PageTitle>Edit Member</PageTitle>
 
-<h2>Edit Member</h2>
-<hr />
 @if (Member is null)
 {
-    <p><em>Loading...</em></p>
+    <div class="d-flex justify-content-center" style="margin-top: 33vh;">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    return;
 }
-else
-{
-    <div class="row">
-        <div class="col-md-4">
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card rounded-2 overflow-hidden p-4">
+            <h5 class="mb-0">Edit Account</h5>
+            <hr class="border-1 border-success opacity-50" />
+
+            @if (ErrorMessage is not null)
+            {
+                <div class="alert alert-danger" role="alert">@ErrorMessage</div>
+            }
+
             <EditForm method="post" Model="Member" OnValidSubmit="UpdateMember" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
-                <input type="hidden" name="Member.Id" value="@Member.Id" />
-                <div class="mb-3">
+
+                <div class="mb-2">
                     <label for="employeeno" class="form-label">EmployeeNo:</label>
-                    <InputText id="employeeno" @bind-Value="Member.EmployeeNo" class="form-control" aria-required="true"/>
+                    <InputText id="employeeno" @bind-Value="Member.EmployeeNo" class="form-control"
+                        aria-required="true" />
                     <ValidationMessage For="() => Member.EmployeeNo" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="firstname" class="form-label">FirstName:</label>
-                    <InputText id="firstname" @bind-Value="Member.FirstName" class="form-control" aria-required="true"/>
-                    <ValidationMessage For="() => Member.FirstName" class="text-danger" />
+
+                <div class="row mb-2">
+                    <div class="col-6">
+                        <label for="firstname" class="form-label">First Name:</label>
+                        <InputText id="firstname" @bind-Value="Member.FirstName" class="form-control"
+                            aria-required="true" />
+                        <ValidationMessage For="() => Member.FirstName" class="text-danger" />
+                    </div>
+                    <div class="col-6">
+                        <label for="lastname" class="form-label">Last Name:</label>
+                        <InputText id="lastname" @bind-Value="Member.LastName" class="form-control"
+                            aria-required="true" />
+                        <ValidationMessage For="() => Member.LastName" class="text-danger" />
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="lastname" class="form-label">LastName:</label>
-                    <InputText id="lastname" @bind-Value="Member.LastName" class="form-control" aria-required="true"/>
-                    <ValidationMessage For="() => Member.LastName" class="text-danger" />
-                </div>
-                <div class="mb-3">
+
+                <div class="mb-2">
                     <label for="email" class="form-label">Email:</label>
-                    <InputText id="email" @bind-Value="Member.Email" class="form-control" aria-required="true"/>
+                    <InputText id="email" @bind-Value="Member.Email" class="form-control" aria-required="true" />
                     <ValidationMessage For="() => Member.Email" class="text-danger" />
                 </div>
-                <div class="mb-3">
+
+                <div class="mb-2">
                     <label for="phone" class="form-label">Phone:</label>
-                    <InputText id="phone" @bind-Value="Member.Phone" class="form-control" aria-required="true"/>
+                    <InputText id="phone" @bind-Value="Member.Phone" class="form-control" aria-required="true" />
                     <ValidationMessage For="() => Member.Phone" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="joiningdate" class="form-label">JoiningDate:</label>
-                    <InputDate id="joiningdate" @bind-Value="Member.JoiningDate" class="form-control" aria-required="true"/>
-                    <ValidationMessage For="() => Member.JoiningDate" class="text-danger" />
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="joiningdate" class="form-label">Joining Date:</label>
+                        <InputDate id="joiningdate" @bind-Value="Member.JoiningDate" class="form-control"
+                            aria-required="true" />
+                        <ValidationMessage For="() => Member.JoiningDate" class="text-danger" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="share" class="form-label">Share:</label>
+                        <InputNumber id="share" @bind-Value="Member.Share" class="form-control" aria-required="true" />
+                        <ValidationMessage For="() => Member.Share" class="text-danger" />
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="share" class="form-label">Share:</label>
-                    <InputNumber id="share" @bind-Value="Member.Share" class="form-control" aria-required="true"/>
-                    <ValidationMessage For="() => Member.Share" class="text-danger" />
-                </div>
-                <div class="mb-3">
+
+                <div class="mb-2">
                     <label for="nominee" class="form-label">Nominee:</label>
                     <InputText id="nominee" @bind-Value="Member.Nominee" class="form-control" />
                     <ValidationMessage For="() => Member.Nominee" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="isactive" class="form-label">IsActive:</label>
-                    <InputCheckbox id="isactive" @bind-Value="Member.IsActive" class="form-check-input" />
-                    <ValidationMessage For="() => Member.IsActive" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="leavingdate" class="form-label">LeavingDate:</label>
-                    <InputDate id="leavingdate" @bind-Value="Member.LeavingDate" class="form-control" />
-                    <ValidationMessage For="() => Member.LeavingDate" class="text-danger" />
-                </div>
-                <div class="mb-3">
+
+                <div class="mb-2">
                     <label for="locationid" class="form-label">Location:</label>
                     <InputSelect id="locationid" @bind-Value="Member.LocationId" class="form-control">
-                        <option value="">-- Select Location --</option>
+                        <option value="0">-- Select Location --</option>
                         @foreach (var location in Locations)
                         {
                             <option value="@location.Id">@location.Name</option>
@@ -83,14 +100,12 @@ else
                     </InputSelect>
                     <ValidationMessage For="() => Member.LocationId" class="text-danger" />
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+
+                <button type="submit" class="btn btn-success btn-sm mb-2">Save</button>
+                <a href="/members" class="btn btn-secondary btn-sm mb-2">Back </a>
             </EditForm>
         </div>
     </div>
-}
-
-<div>
-    <a href="/members">Back to List</a>
 </div>
 
 @code {
@@ -98,51 +113,47 @@ else
     private int Id { get; set; }
 
     [SupplyParameterFromForm]
-    private Member? Member { get; set; }
+    private MemberRequestDto? Member { get; set; }
 
-    private List<Location> Locations = new();
+    private List<LocationDto> Locations = new();
+    private string? ErrorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        Member ??= await context.Members.FirstOrDefaultAsync(m => m.Id == Id);
-        Locations = await context.Locations.OrderBy(l => l.Name).ToListAsync();
+        Locations = await LocationService.GetLocationListAync();
+        var member = await MemberService.GetMemberByIdAsync(Id);
 
-        if (Member is null)
+        if (member is null)
         {
             NavigationManager.NavigateTo("notfound");
+            return;
         }
+
+        Member ??= new MemberRequestDto
+        {
+            EmployeeNo = member.EmployeeNo,
+            FirstName = member.FirstName,
+            LastName = member.LastName,
+            Email = member.Email,
+            Phone = member.Phone,
+            JoiningDate = member.JoiningDate,
+            Share = member.Share,
+            Nominee = member.Nominee,
+            LocationId = member.LocationId
+        };
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateMember()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(Member!).State = EntityState.Modified;
-
         try
         {
-            await context.SaveChangesAsync();
+            await MemberService.UpdateMember(Id, Member!);
+            NavigationManager.NavigateTo("/members");
         }
-        catch (DbUpdateConcurrencyException)
+        catch (InvalidOperationException ex)
         {
-            if (!MemberExists(Member!.Id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
+            ErrorMessage = ex.Message;
+            Console.WriteLine(ex.Message);
         }
-
-        NavigationManager.NavigateTo("/members");
-    }
-
-    private bool MemberExists(int id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.Members.Any(e => e.Id == id);
     }
 }

@@ -1,43 +1,54 @@
 ﻿@page "/locations/create"
+@using MbfApp.Dtos.Locations
 
-@inject IDbContextFactory<AppDbContext> DbFactory
+@inject ILocationService LocationService
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create New Location</PageTitle>
 
-<h1>Create</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card rounded-2 overflow-hidden p-4">
+            <h5 class="mb-0">Create New Location</h5>
+            <hr class="border-1 border-success opacity-50">
 
-<h2>Location</h2>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Location" OnValidSubmit="AddLocation" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
-            <div class="mb-3">
-                <label for="nmae" class="form-label">Location:</label> 
-                <InputText id="name" @bind-Value="Location.Name" class="form-control" aria-required="true"/> 
-                <ValidationMessage For="() => Location.Name" class="text-danger" /> 
-            </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
+            @if (ErrorMessage is not null)
+            {
+                <div class="alert alert-danger" role="alert">@ErrorMessage</div>
+            }
+
+            <EditForm method="post" Model="Location" OnValidSubmit="AddLocation" FormName="create" Enhance>
+                <DataAnnotationsValidator />
+                
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <InputText id="name" @bind-Value="Location.Name" class="form-control" aria-required="true" />
+                    <ValidationMessage For="() => Location.Name" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-success btn-sm mb-2">Create</button>
+                <a href="/locations" class="btn btn-secondary btn-sm mb-2">Back </a>
+            </EditForm>
+        </div>
     </div>
-</div>
-
-<div>
-    <a href="/locations">Back to List</a>
 </div>
 
 @code {
     [SupplyParameterFromForm]
-    private Location Location { get; set; } = new();
+    private LocationRequestDto Location { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private string? ErrorMessage;
+
     private async Task AddLocation()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Locations.Add(Location);
-        await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/locations");
+        try 
+        {
+            await LocationService.CreateLocation(Location);
+            NavigationManager.NavigateTo("/locations");
+        }
+        catch (InvalidOperationException ex)
+        {
+            ErrorMessage = ex.Message;
+            Console.WriteLine(ex.Message);
+        }
     }
 }

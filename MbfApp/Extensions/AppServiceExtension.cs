@@ -1,6 +1,4 @@
-﻿using MbfApp.Services.AccountCodeService;
-using MbfApp.Services.LoanServices;
-using MbfApp.Services.MemberServices;
+﻿using MbfApp.Services;
 
 namespace MbfApp.Extensions;
 
@@ -11,6 +9,7 @@ public static class AppServiceExtension
         services.AddScoped<ILoanService, LoanService>();
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ILocationService, LocationService>();
 
         return services;
     }

@@ -3,7 +3,7 @@ using MbfApp.Data.Entities;
 using MbfApp.Data.Enums;
 using MbfApp.Dtos.Loan;
 
-namespace MbfApp.Services.LoanServices;
+namespace MbfApp.Services;
 
 public interface ILoanService
 {
