@@ -3,12 +3,12 @@
 @using MbfApp.Dtos.AccountCodes
 @using MbfApp.Services.AccountCodeService
 @inject NavigationManager NavigationManager
-@inject IAccountCodeService AccountCodeService
+@inject IAccountService AccountService
 @attribute [StreamRendering]
 
 <PageTitle>Delete</PageTitle>
 
-@if (accountCode is null)
+@if (account is null)
 {
     <div class="d-flex justify-content-center" style="margin-top: 33vh;">
         <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
@@ -35,16 +35,16 @@
             <div class="border rounded-2 bg-light p-3 mb-3">
                 <dl class="row mb-2">
                     <dt class="col-sm-4 text-secondary small">Account Name</dt>
-                    <dd class="col-sm-8 text-dark small">@accountCode.Name</dd>
+                    <dd class="col-sm-8 text-dark small">@account.Name</dd>
                 </dl>
 
                 <dl class="row mb-0">
                     <dt class="col-sm-4 text-secondary small">Account Type</dt>
-                    <dd class="col-sm-8 text-dark small">@accountCode.AccountType</dd>
+                    <dd class="col-sm-8 text-dark small">@account.AccountType</dd>
                 </dl>
             </div>
 
-            <EditForm method="post" Model="accountCode" OnValidSubmit="DeleteAccountCode" FormName="delete" Enhance>
+            <EditForm method="post" Model="account" OnValidSubmit="DeleteAccountCode" FormName="delete" Enhance>
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-danger btn-sm px-4">Delete</button>
                     <a href="/accountcodes" class="btn btn-outline-secondary btn-sm px-4">Cancel</a>
@@ -56,7 +56,7 @@
 
 
 @code {
-    private AccountCodeResponse? accountCode;
+    private AccountResponse? account;
 
     [SupplyParameterFromQuery]
     private int Id { get; set; }
@@ -67,16 +67,16 @@
     {
         await Task.Delay(500); // to be removed
 
-        accountCode = await AccountCodeService.GetAccountCodeAsync(Id);
+        account = await AccountService.GetAccountAsync(Id);
 
-        if (accountCode is null) NavigationManager.NavigateTo("notfound");
+        if (account is null) NavigationManager.NavigateTo("notfound");
     }
 
     private async Task DeleteAccountCode()
     {
         try 
         {
-            await AccountCodeService.DeleteAccountCode(Id);
+            await AccountService.DeleteAccount(Id);
             NavigationManager.NavigateTo("/accountcodes");
         }
         catch (InvalidOperationException ex)

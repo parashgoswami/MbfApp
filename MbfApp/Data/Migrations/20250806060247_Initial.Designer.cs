@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MbfApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250731101738_Initial")]
+    [Migration("20250806060247_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -96,7 +96,7 @@ namespace MbfApp.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("MbfApp.Data.Entities.AccountCode", b =>
+            modelBuilder.Entity("MbfApp.Data.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,17 +104,111 @@ namespace MbfApp.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccountType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("AccountLabel")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<int>("AccountType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
-                    b.ToTable("AccountCodes");
+                    b.ToTable("Account");
+                });
+
+            modelBuilder.Entity("MbfApp.Data.Entities.FinYear", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FinYrLabel")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("IntDeposit")
+                        .HasColumnType("real");
+
+                    b.Property<float>("IntLoan")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FinYears");
+                });
+
+            modelBuilder.Entity("MbfApp.Data.Entities.Journal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FinYearId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("JournalDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("JvNo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Narration")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinYearId");
+
+                    b.ToTable("Journals");
+                });
+
+            modelBuilder.Entity("MbfApp.Data.Entities.JournalLine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("CrAmt")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("DbAmt")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("JournalId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JournalId");
+
+                    b.ToTable("JournalLine");
                 });
 
             modelBuilder.Entity("MbfApp.Data.Entities.Loan", b =>
@@ -228,6 +322,44 @@ namespace MbfApp.Data.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("MbfApp.Data.Entities.MemberLedger", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("DepositCr")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("DepositDr")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("EmpCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("IntDeposit")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("IntLoan")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("LoanCr")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("LoanDr")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("YearMonth")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MemberLedgers");
                 });
 
             modelBuilder.Entity("MbfApp.Data.Entities.Withdrawal", b =>
@@ -399,6 +531,28 @@ namespace MbfApp.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MbfApp.Data.Entities.Journal", b =>
+                {
+                    b.HasOne("MbfApp.Data.Entities.FinYear", "FinYear")
+                        .WithMany()
+                        .HasForeignKey("FinYearId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FinYear");
+                });
+
+            modelBuilder.Entity("MbfApp.Data.Entities.JournalLine", b =>
+                {
+                    b.HasOne("MbfApp.Data.Entities.Journal", "Journal")
+                        .WithMany("Lines")
+                        .HasForeignKey("JournalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Journal");
+                });
+
             modelBuilder.Entity("MbfApp.Data.Entities.Loan", b =>
                 {
                     b.HasOne("MbfApp.Data.Entities.Member", "Member")
@@ -481,6 +635,11 @@ namespace MbfApp.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MbfApp.Data.Entities.Journal", b =>
+                {
+                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }

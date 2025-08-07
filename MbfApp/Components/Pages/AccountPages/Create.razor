@@ -5,14 +5,14 @@
 @using MbfApp.Services.MemberServices
 
 @inject NavigationManager NavigationManager
-@inject IAccountCodeService AccountCodeService
+@inject IAccountService AccountService
 
-<PageTitle>Create Account Code</PageTitle>
+<PageTitle>Create New  Account</PageTitle>
 
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card rounded-2 overflow-hidden p-4">
-            <h5 class="mb-0">Create Account Code</h5>
+            <h5 class="mb-0">Create New Account</h5>
             <hr class="border-1 border-success opacity-50">
 
             @if (ErrorMessage is not null) 
@@ -47,7 +47,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private AccountCodeRequestDto Request { get; set; } = new();
+    private AccountRequestDto Request { get; set; } = new();
 
     private string? ErrorMessage;
 
@@ -55,7 +55,7 @@
     {
         try 
         {
-            await AccountCodeService.CreateNewAccountCode(Request);
+            await AccountService.CreateNewAccountCode(Request);
             NavigationManager.NavigateTo("/accountcodes");
         }
         catch (InvalidOperationException ex)

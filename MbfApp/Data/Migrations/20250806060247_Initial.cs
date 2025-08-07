@@ -13,17 +13,18 @@ namespace MbfApp.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AccountCodes",
+                name: "Account",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     AccountType = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
+                    AccountLabel = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccountCodes", x => x.Id);
+                    table.PrimaryKey("PK_Account", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,6 +69,24 @@ namespace MbfApp.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FinYears",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FinYrLabel = table.Column<string>(type: "text", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IntDeposit = table.Column<float>(type: "real", nullable: false),
+                    IntLoan = table.Column<float>(type: "real", nullable: false),
+                    IsClosed = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FinYears", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Locations",
                 columns: table => new
                 {
@@ -78,6 +97,26 @@ namespace MbfApp.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Locations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MemberLedgers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EmpCode = table.Column<string>(type: "text", nullable: false),
+                    YearMonth = table.Column<int>(type: "integer", nullable: false),
+                    DepositDr = table.Column<decimal>(type: "numeric", nullable: false),
+                    DepositCr = table.Column<decimal>(type: "numeric", nullable: false),
+                    IntDeposit = table.Column<decimal>(type: "numeric", nullable: false),
+                    LoanDr = table.Column<decimal>(type: "numeric", nullable: false),
+                    LoanCr = table.Column<decimal>(type: "numeric", nullable: false),
+                    IntLoan = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MemberLedgers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -187,6 +226,28 @@ namespace MbfApp.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Journals",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    JvNo = table.Column<string>(type: "text", nullable: false),
+                    FinYearId = table.Column<int>(type: "integer", nullable: false),
+                    JournalDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Narration = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Journals", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Journals_FinYears_FinYearId",
+                        column: x => x.FinYearId,
+                        principalTable: "FinYears",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Members",
                 columns: table => new
                 {
@@ -211,6 +272,29 @@ namespace MbfApp.Data.Migrations
                         name: "FK_Members_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JournalLine",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    JournalId = table.Column<int>(type: "integer", nullable: false),
+                    AccountId = table.Column<int>(type: "integer", nullable: false),
+                    DbAmt = table.Column<decimal>(type: "numeric", nullable: false),
+                    CrAmt = table.Column<decimal>(type: "numeric", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JournalLine", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JournalLine_Journals_JournalId",
+                        column: x => x.JournalId,
+                        principalTable: "Journals",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -303,6 +387,16 @@ namespace MbfApp.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_JournalLine_JournalId",
+                table: "JournalLine",
+                column: "JournalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Journals_FinYearId",
+                table: "Journals",
+                column: "FinYearId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Loans_MemberId",
                 table: "Loans",
                 column: "MemberId");
@@ -322,7 +416,7 @@ namespace MbfApp.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AccountCodes");
+                name: "Account");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -340,7 +434,13 @@ namespace MbfApp.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "JournalLine");
+
+            migrationBuilder.DropTable(
                 name: "Loans");
+
+            migrationBuilder.DropTable(
+                name: "MemberLedgers");
 
             migrationBuilder.DropTable(
                 name: "Withdrawals");
@@ -352,7 +452,13 @@ namespace MbfApp.Data.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Journals");
+
+            migrationBuilder.DropTable(
                 name: "Members");
+
+            migrationBuilder.DropTable(
+                name: "FinYears");
 
             migrationBuilder.DropTable(
                 name: "Locations");

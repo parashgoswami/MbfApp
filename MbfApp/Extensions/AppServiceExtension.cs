@@ -10,7 +10,7 @@ public static class AppServiceExtension
     {
         services.AddScoped<ILoanService, LoanService>();
         services.AddScoped<IMemberService, MemberService>();
-        services.AddScoped<IAccountCodeService, AccountCodeService>();
+        services.AddScoped<IAccountService, AccountService>();
 
         return services;
     }

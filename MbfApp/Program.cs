@@ -21,6 +21,8 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
     await AppDbSeed.SeedAdminUserAsync(scope.ServiceProvider);
+    await AppDbSeed.SeedAccountAsync(scope.ServiceProvider);
+    await AppDbSeed.SeedLocationAsync(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.
@@ -31,9 +33,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
     app.UseMigrationsEndPoint();
 }
-
 app.UseHttpsRedirection();
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MbfApp.Data.Entities;
 
-public class AccountCode
+public class Account
 {
     public int Id { get; set; } 
       
@@ -12,5 +12,6 @@ public class AccountCode
 
     [Required]
     [StringLength(50)]
-    public string Name { get; set; } = string.Empty;
+    public string AccountLabel { get; set; } = string.Empty;
+    public bool IsActive { get; set; } = true;
 }

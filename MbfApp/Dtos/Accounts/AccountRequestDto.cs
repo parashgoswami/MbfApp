@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MbfApp.Dtos.AccountCodes;
 
-public class AccountCodeRequestDto
+public class AccountRequestDto
 {
     [Required]
     public AccountType AccountType { get; set; }

@@ -6,10 +6,15 @@ namespace MbfApp.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) 
     : IdentityDbContext<ApplicationUser>(options)
-{  
-    public DbSet<Member> Members { get; set; } = default!;
-    public DbSet<Location> Locations { get; set; } = default!;
-    public DbSet<AccountCode> AccountCodes { get; set; } = default!;
-    public DbSet<Loan> Loans { get; set; } = default!;
-    public DbSet<Withdrawal> Withdrawals { get; set; } = default!;
+{
+    public DbSet<Location> Locations { get; set; }
+    public DbSet<Account> Accounts { get; set; }
+    public DbSet<FinYear> FinYears { get; set; }
+    public DbSet<Account> AccountBalances { get; set; }
+    public DbSet<Member> Members { get; set; }    
+    public DbSet<Journal> Journals { get; set; }
+    public DbSet<MemberLedger> MemberLedgers { get; set; }
+    public DbSet<MemberLedgerBalance> MemberLedgerBalances { get; set; }
+    public DbSet<Loan> Loans { get; set; }
+    public DbSet<Withdrawal> Withdrawals { get; set; }
 }

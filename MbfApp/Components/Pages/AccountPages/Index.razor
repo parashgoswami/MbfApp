@@ -3,9 +3,9 @@
 @using MbfApp.Dtos.AccountCodes
 @using MbfApp.Services.AccountCodeService
 
-@inject IAccountCodeService AccountCodeService
+@inject IAccountService AccountService
 
-<PageTitle>Account Codes</PageTitle>
+<PageTitle>Chart of Accounts</PageTitle>
 
 <h5>Chart of Accounts</h5>
 <hr class="border-1 border-success opacity-50"/>
@@ -31,10 +31,10 @@
 </div>
 
 @code 
-{    
-    private List<AccountCodeResponse> accountcodes = new();
+{
+    private List<AccountResponse> accountcodes = new();
     protected override async Task OnInitializedAsync()
     {
-        accountcodes = await AccountCodeService.ListAccountCodes();
+        accountcodes = await AccountService.ListAccounts();
     } 
 }

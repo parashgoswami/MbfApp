@@ -3,10 +3,10 @@
 @using MbfApp.Dtos.AccountCodes
 @using MbfApp.Services.AccountCodeService
 @inject NavigationManager NavigationManager
-@inject IAccountCodeService AccountCodeService
+@inject IAccountService AccountService
 @attribute [StreamRendering]
 
-<PageTitle>Edit Account Codes</PageTitle>
+<PageTitle>Edit Account </PageTitle>
 
 @if (Request is null)
 {
@@ -22,7 +22,7 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card rounded-2 overflow-hidden p-4">
-            <h5 class="mb-0">Edit Account Code</h5>
+            <h5 class="mb-0">Edit Account</h5>
             <hr class="border-1 border-success opacity-50" />
 
             @if (ErrorMessage is not null)
@@ -63,7 +63,7 @@
     private int Id { get; set; }
 
     [SupplyParameterFromForm]
-    private AccountCodeRequestDto? Request { get; set; }
+    private AccountRequestDto? Request { get; set; }
 
     private string? ErrorMessage;
 
@@ -71,11 +71,11 @@
     {
         await Task.Delay(500); // to be removed
 
-        var accountCode = await AccountCodeService.GetAccountCodeAsync(Id);
+        var accountCode = await AccountService.GetAccountAsync(Id);
 
         if (accountCode is null) NavigationManager.NavigateTo("notfound");
 
-        Request ??= new AccountCodeRequestDto
+        Request ??= new AccountRequestDto
         {
             Name = accountCode!.Name,
             AccountType = accountCode.AccountType
@@ -86,7 +86,7 @@
     {
         try
         {
-            await AccountCodeService.UpdateAccountCode(Id, Request!);
+            await AccountService.UpdateAccount(Id, Request!);
             NavigationManager.NavigateTo("/accountcodes");
         }
         catch (InvalidOperationException ex)
