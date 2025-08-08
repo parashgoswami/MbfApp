@@ -1,72 +1,99 @@
 ﻿@page "/members/create"
-@using MbfApp.Dtos.Member
-@using MbfApp.Services.MemberServices
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.EntityFrameworkCore
-@using MbfApp.Data.Entities
 
+@using MbfApp.Dtos.Locations
+@using MbfApp.Dtos.Member
+
+@inject ILocationService LocationService
 @inject IMemberService MemberService
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create Member</PageTitle>
-
-<div class="row">
+<div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card rounded-2 overflow-hidden p-4">
-            <h5 >Create Member</h5>
-            <hr class="border border-success border-1 opacity-50 py-0">
-            <div class="card-body py-2 px-5">
-                <EditForm method="post" Model="Member" OnValidSubmit="AddMember" FormName="create" Enhance>
-                    <DataAnnotationsValidator />
-                   @*  <ValidationSummary class="text-danger" role="alert" /> *@
-                    
+            <h5 class="mb-0">Create New Account</h5>
+            <hr class="border-1 border-success opacity-50">
 
-                  <div class="mb-2">
-                        <label for="employeeno" class="form-label small">Employee No:</label>
-                        <InputText id="employeeno" @bind-Value="Member.EmployeeNo" class="form-control form-control-sm" aria-required="true" />
-                        <ValidationMessage For="() => Member.EmployeeNo" class="text-danger" />
-                    </div> 
-                    <div class="mb-2">
+            @if (ErrorMessage is not null)
+            {
+                <div class="alert alert-danger" role="alert">@ErrorMessage</div>
+            }
+
+            <EditForm method="post" Model="Member" OnValidSubmit="AddMember" FormName="create" Enhance>
+                <DataAnnotationsValidator />
+
+                <div class="mb-2">
+                    <label for="employeeno" class="form-label small">Employee No:</label>
+                    <InputText id="employeeno" @bind-Value="Member.EmployeeNo" class="form-control form-control-sm"
+                        aria-required="true" />
+                    <ValidationMessage For="() => Member.EmployeeNo" class="text-danger" />
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
                         <label for="firstname" class="form-label small">First Name:</label>
-                        <InputText id="firstname" @bind-Value="Member.FirstName" class="form-control form-control-sm" aria-required="true" />
+                        <InputText id="firstname" @bind-Value="Member.FirstName" class="form-control form-control-sm"
+                            aria-required="true" />
                         <ValidationMessage For="() => Member.FirstName" class="text-danger" />
                     </div>
-                    <div class="mb-2">
+                    <div class="col-md-6">
                         <label for="lastname" class="form-label small">Last Name:</label>
-                        <InputText id="lastname" @bind-Value="Member.LastName" class="form-control form-control-sm" aria-required="true" />
+                        <InputText id="lastname" @bind-Value="Member.LastName" class="form-control form-control-sm"
+                            aria-required="true" />
                         <ValidationMessage For="() => Member.LastName" class="text-danger" />
                     </div>
-                    <div class="mb-2">
-                        <label for="email" class="form-label small">Email:</label>
-                        <InputText id="email" @bind-Value="Member.Email" class="form-control form-control-sm" aria-required="true" />
-                        <ValidationMessage For="() => Member.Email" class="text-danger" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="phone" class="form-label small">Phone:</label>
-                        <InputText id="phone" @bind-Value="Member.Phone" class="form-control form-control-sm" aria-required="true" />
-                        <ValidationMessage For="() => Member.Phone" class="text-danger" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="joiningdate" class="form-label small">JoiningDate:</label>
-                        <InputDate id="joiningdate" @bind-Value="Member.JoiningDate" class="form-control form-control-sm" aria-required="true" />
+                </div>
+
+                <div class="mb-2">
+                    <label for="email" class="form-label small">Email:</label>
+                    <InputText id="email" @bind-Value="Member.Email" class="form-control form-control-sm"
+                        aria-required="true" />
+                    <ValidationMessage For="() => Member.Email" class="text-danger" />
+                </div>
+
+                <div class="mb-2">
+                    <label for="phone" class="form-label small">Phone:</label>
+                    <InputText id="phone" @bind-Value="Member.Phone" class="form-control form-control-sm"
+                        aria-required="true" />
+                    <ValidationMessage For="() => Member.Phone" class="text-danger" />
+                </div>
+
+                <div class="mb-2 row">
+                    <div class="col-md-6">
+                        <label for="joiningdate" class="form-label small">Joining Date:</label>
+                        <InputDate id="joiningdate" @bind-Value="Member.JoiningDate"
+                            class="form-control form-control-sm" aria-required="true" />
                         <ValidationMessage For="() => Member.JoiningDate" class="text-danger" />
                     </div>
-                    <div class="mb-2">
+                    <div class="col-md-6">
                         <label for="share" class="form-label small">Share:</label>
-                        <InputNumber id="share" @bind-Value="Member.Share" class="form-control form-control-sm" aria-required="true" />
+                        <InputNumber id="share" @bind-Value="Member.Share" class="form-control form-control-sm"
+                            aria-required="true" />
                         <ValidationMessage For="() => Member.Share" class="text-danger" />
                     </div>
-                    <div class="mb-2">
-                        <label for="nominee" class="form-label small">Nominee:</label>
-                        <InputText id="nominee" @bind-Value="Member.Nominee" class="form-control form-control-sm" />
-                        <ValidationMessage For="() => Member.Nominee" class="text-danger" />
-                    </div>
+                </div>
 
-                    <button type="submit" class="btn btn-success btn-sm mb-2">Create</button>
-                    <a href="/members" class="btn btn-secondary btn-sm mb-2">Back </a>
-                </EditForm>
-            </div>
+                <div class="mb-2">
+                    <label for="nominee" class="form-label small">Location:</label>
+                    <InputSelect class="form-control form-control-sm" @bind-Value="Member.LocationId">
+                        <option value="0">-- Select Location --</option>
+                        @foreach (var location in Locations)
+                        {
+                            <option value="@location.Id">@location.Name</option>
+                        }
+                    </InputSelect>
+                    
+                    <ValidationMessage For="() => Member.LocationId" class="text-danger" />
+                </div>
 
+                <div class="mb-2">
+                    <label for="nominee" class="form-label small">Nominee:</label>
+                    <InputText id="nominee" @bind-Value="Member.Nominee" class="form-control form-control-sm" />
+                    <ValidationMessage For="() => Member.Nominee" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-success btn-sm mb-2">Create</button>
+                <a href="/members" class="btn btn-secondary btn-sm mb-2">Back </a>
+            </EditForm>
         </div>
     </div>
 </div>
@@ -75,10 +102,26 @@
 @code {
     [SupplyParameterFromForm]
     private MemberRequestDto Member { get; set; } = new();
+    private List<LocationDto> Locations = new();
+
+    private string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync() 
+    {
+        Locations = await LocationService.GetLocationListAync();
+    }
 
     private async Task AddMember()
     {
-        await MemberService.CreateNewMember(Member);
-        NavigationManager.NavigateTo("/members");
+        try 
+        {
+            await MemberService.CreateMember(Member);
+            NavigationManager.NavigateTo("/members");
+        }
+        catch (InvalidOperationException ex)
+        {
+            ErrorMessage = ex.Message;
+            Console.WriteLine(ex.Message);
+        }
     }
 }

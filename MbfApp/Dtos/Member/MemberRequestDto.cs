@@ -23,7 +23,13 @@ public class MemberRequestDto
     [StringLength(100)]
     public string? Nominee { get; set; }
     public int Share { get; set; }
-    [Required, DateNotInFuture, Column(TypeName = "date")]
-    public DateTime JoiningDate { get; set; }
 
+    [Required, DateNotInFuture, Column(TypeName = "date")]
+    public DateTime JoiningDate { get; set; } = DateTime.Now;
+
+    [DateNotInFuture, Column(TypeName = "date")]
+    public DateTime? LeavingDate { get; set; }
+    
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a location")]
+    public int LocationId { get; set; }
 }

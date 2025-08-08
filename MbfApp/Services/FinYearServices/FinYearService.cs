@@ -1,4 +1,4 @@
-﻿namespace MbfApp.Services.FinYearServices;
+﻿namespace MbfApp.Services;
 public interface IFinYearService
 {
 }

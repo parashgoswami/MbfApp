@@ -3,7 +3,7 @@ using MbfApp.Data.Entities;
 using MbfApp.Dtos.AccountCodes;
 using Microsoft.EntityFrameworkCore;
 
-namespace MbfApp.Services.AccountCodeService;
+namespace MbfApp.Services;
 
 public interface IAccountService
 {
@@ -12,7 +12,6 @@ public interface IAccountService
     public Task DeleteAccount(int id);
     public Task UpdateAccount(int id, AccountRequestDto request);
     public Task<List<AccountResponse>> ListAccounts();
-
 }
 
 public class AccountService : IAccountService
@@ -64,6 +63,7 @@ public class AccountService : IAccountService
                 AccountType = a.AccountType,
                 Name = a.AccountLabel
             }).FirstOrDefaultAsync();
+            
         return accountCode;
     }
 
@@ -88,10 +88,12 @@ public class AccountService : IAccountService
             throw new InvalidOperationException("Account not found.");
 
         var name = request.Name.Trim();
+
         if (accountCode.AccountLabel.ToLower() != name.ToLower())
         {
             var exists = _context.Set<Account>()
                 .Any(a => a.AccountLabel.ToLower() == name.ToLower());
+
             if (exists)
                 throw new InvalidOperationException("Account name must be unique.");
         }

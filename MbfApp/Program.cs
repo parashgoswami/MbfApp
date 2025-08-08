@@ -23,6 +23,7 @@ using (var scope = app.Services.CreateScope())
     await AppDbSeed.SeedAdminUserAsync(scope.ServiceProvider);
     await AppDbSeed.SeedAccountAsync(scope.ServiceProvider);
     await AppDbSeed.SeedLocationAsync(scope.ServiceProvider);
+    await AppDbSeed.SeedMembersAsync(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.
