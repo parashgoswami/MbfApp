@@ -1,0 +1,69 @@
+﻿@page "/upload-ledger"
+
+@using System.Text
+@inject IMemberLedgerService MemberLedgerService
+@rendermode InteractiveServer
+
+<h3>Upload Member Ledger CSV</h3>
+
+@if (!string.IsNullOrEmpty(StatusMessage))
+{
+    <div class="alert alert-info">@StatusMessage</div>
+}
+
+<div class="mb-3">
+    <button class="btn btn-secondary" @onclick="DownloadTemplate">Download CSV Template</button>
+</div>
+
+<InputFile OnChange="HandleFileSelected" accept=".csv" />
+<button class="btn btn-primary mt-2" @onclick="UploadFile" disabled="@(!IsFileSelected)">
+    Upload
+</button>
+
+@code {
+    private IBrowserFile? selectedFile;
+    private bool IsFileSelected => selectedFile != null;
+    private string? StatusMessage;
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        StatusMessage = null;
+    }
+
+    private async Task UploadFile()
+    {
+        if (selectedFile == null)
+        {
+            StatusMessage = "Please select a file first.";
+            return;
+        }
+
+        try
+        {
+            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB max
+            await MemberLedgerService.ImportFromCsvAsync(stream);
+
+            StatusMessage = "CSV uploaded and processed successfully!";
+            selectedFile = null;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error: {ex.Message}";
+        }
+    }
+
+    private async Task DownloadTemplate()
+    {
+        var csvContent = "EmpCode,YearMonth,DepositDr,DepositCr,IntDeposit,LoanDr,LoanCr,IntLoan\n" +
+                         "EMP001,202501,0,0,0,0,0,0\n";
+
+        var bytes = Encoding.UTF8.GetBytes(csvContent);
+        var base64 = Convert.ToBase64String(bytes);
+        var fileName = "MemberLedgerTemplate.csv";
+
+        await JS.InvokeVoidAsync("downloadFile", fileName, base64);
+    }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+}

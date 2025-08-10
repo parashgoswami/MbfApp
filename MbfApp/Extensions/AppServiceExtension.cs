@@ -10,6 +10,7 @@ public static class AppServiceExtension
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ILocationService, LocationService>();
+        services.AddScoped<IMemberLedgerService, MemberLedgerService>();
 
         return services;
     }
