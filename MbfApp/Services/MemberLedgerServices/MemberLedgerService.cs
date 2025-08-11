@@ -51,12 +51,12 @@ public class MemberLedgerService : IMemberLedgerService
             else
             {
                 var existing = await _context.MemberLedgers.FirstAsync(m => m.EmpCode == record.EmpCode && m.YearMonth == record.YearMonth);
-                existing.DepositDr = record.DepositDr;
+                //existing.DepositDr = record.DepositDr;
                 existing.DepositCr = record.DepositCr;
-                existing.IntDeposit = record.IntDeposit;
-                existing.LoanDr = record.LoanDr;
+               // existing.IntDeposit = record.IntDeposit;
+               // existing.LoanDr = record.LoanDr;
                 existing.LoanCr = record.LoanCr;
-                existing.IntLoan = record.IntLoan;
+                //existing.IntLoan = record.IntLoan;
             }
         }
 

@@ -43,7 +43,6 @@
         {
             using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB max
             await MemberLedgerService.ImportFromCsvAsync(stream);
-
             StatusMessage = "CSV uploaded and processed successfully!";
             selectedFile = null;
         }
@@ -55,8 +54,10 @@
 
     private async Task DownloadTemplate()
     {
-        var csvContent = "EmpCode,YearMonth,DepositDr,DepositCr,IntDeposit,LoanDr,LoanCr,IntLoan\n" +
-                         "EMP001,202501,0,0,0,0,0,0\n";
+        // var csvContent = "EmpCode,YearMonth,DepositDr,DepositCr,IntDeposit,LoanDr,LoanCr,IntLoan\n" +
+        //                  "EMP001,202501,0,0,0,0,0,0\n";
+
+        var csvContent = "EmpCode,YearMonth,Deposit(Cr),Loan(Cr)\n";
 
         var bytes = Encoding.UTF8.GetBytes(csvContent);
         var base64 = Convert.ToBase64String(bytes);
