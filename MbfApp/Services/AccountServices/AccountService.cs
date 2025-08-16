@@ -5,15 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MbfApp.Services;
 
-public interface IAccountService
-{
-    public Task<AccountResponse?> GetAccountAsync(int id);  
-    public Task CreateNewAccountCode(AccountRequestDto request);
-    public Task DeleteAccount(int id);
-    public Task UpdateAccount(int id, AccountRequestDto request);
-    public Task<List<AccountResponse>> ListAccounts();
-}
-
 public class AccountService : IAccountService
 {
     private AppDbContext _context;
@@ -22,10 +13,11 @@ public class AccountService : IAccountService
     {
         _context = context;
     }
+    
     public async Task CreateNewAccountCode(AccountRequestDto request)
     {
         var name = request.Name.Trim();
-       
+
         var exists = await _context.Set<Account>()
             .AnyAsync(a => a.AccountLabel.ToLower() == name.ToLower());
 
