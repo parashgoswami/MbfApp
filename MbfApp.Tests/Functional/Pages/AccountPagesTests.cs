@@ -7,8 +7,18 @@ using Microsoft.Playwright;
 
 namespace MbfApp.Tests.Functional.Pages;
 
+[Collection("Database")]
 public class AccountPagesTests : BlazorPageTest
 {
+    private readonly DatabaseFixture _fixture;
+
+    public AccountPagesTests(DatabaseFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
+    protected override string ConnectionString => _fixture.ConnectionString;
+
     [Fact]
     public async Task Account_Create_Works()
     {

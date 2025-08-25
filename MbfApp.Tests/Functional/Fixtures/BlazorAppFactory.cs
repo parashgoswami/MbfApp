@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Testcontainers.PostgreSql;
 
 using MbfApp.Data;
 using MbfApp.Tests.Functional.Utils;
@@ -15,11 +14,10 @@ using MbfApp.Tests.Functional.Utils;
 namespace MbfApp.Tests.Functional.Fixtures;
 
 public sealed class BlazorAppFactory(
+    string connectionString,
     Action<IWebHostBuilder>? configureWebHost = null) : WebApplicationFactory<Program>
 {
     private IHost? host;
-
-    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder().Build();
 
     public override IServiceProvider Services
         => host?.Services
@@ -31,8 +29,6 @@ public sealed class BlazorAppFactory(
 
     public async Task StartAsync()
     {
-        await postgres.StartAsync();
-        
         // Triggers CreateHost() getting called.
         _ = base.Services;
 
@@ -62,13 +58,13 @@ public sealed class BlazorAppFactory(
             webHostBuilder.UseKestrel();
             webHostBuilder.UseUrls("https://127.0.0.1:0");
 
-            webHostBuilder.ConfigureTestServices(services => 
+            webHostBuilder.ConfigureTestServices(services =>
             {
                 services.RemoveDbContext<AppDbContext>();
 
                 services.AddDbContextFactory<AppDbContext>(options =>
                 {
-                    options.UseNpgsql(postgres.GetConnectionString());
+                    options.UseNpgsql(connectionString);
                 });
             });
         });
@@ -83,7 +79,6 @@ public sealed class BlazorAppFactory(
     {
         await base.DisposeAsync();
         host?.Dispose();
-        await postgres.DisposeAsync();
         GC.SuppressFinalize(this);
     }
 

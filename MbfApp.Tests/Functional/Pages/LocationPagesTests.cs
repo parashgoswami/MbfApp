@@ -6,8 +6,18 @@ using Location = MbfApp.Data.Entities.Location;
 
 namespace MbfApp.Tests.Functional.Pages;
 
+[Collection("Database")]
 public class LocationPagesTests : BlazorPageTest
 {
+    private readonly DatabaseFixture _fixture;
+
+    public LocationPagesTests(DatabaseFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
+    protected override string ConnectionString => _fixture.ConnectionString;
+
     [Fact]
     public async Task Location_Create_Works()
     {

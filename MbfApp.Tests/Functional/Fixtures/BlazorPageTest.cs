@@ -1,32 +1,36 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit;
 
 namespace MbfApp.Tests.Functional.Fixtures;
 
-public class BlazorPageTest : BrowserTest
+public abstract class BlazorPageTest : BrowserTest
 {
     private BlazorAppFactory? host;
     private IPage? page;
     private IBrowserContext? context;
-
+    
     public IBrowserContext Context => context ?? throw new InvalidOperationException("Setup has not been run.");
 
     public IPage Page => page ?? throw new InvalidOperationException("Setup has not been run.");
 
     public BlazorAppFactory Host => host ?? throw new InvalidOperationException("Setup has not been run.");
 
-    public virtual BrowserNewContextOptions? ContextOptions() => null;
+    protected abstract string ConnectionString { get; }
 
     protected virtual void ConfigureWebHost(IWebHostBuilder builder) { }
 
     public override async Task InitializeAsync()
     {
-        host = new BlazorAppFactory(ConfigureWebHost);
+        if(ConnectionString.IsNullOrEmpty())
+            throw new InvalidOperationException("DB connection string not set.");
+
+        host = new BlazorAppFactory(ConnectionString, ConfigureWebHost);
         await host.StartAsync();
         await base.InitializeAsync();
 
-        var options = ContextOptions() ?? new BrowserNewContextOptions();
+        var options = new BrowserNewContextOptions();
         options.BaseURL = Host.ServerAddress;
         options.IgnoreHTTPSErrors = true;
 
