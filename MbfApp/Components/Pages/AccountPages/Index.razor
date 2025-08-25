@@ -1,4 +1,4 @@
-﻿@page "/accountcodes"
+﻿@page "/accounts"
 
 @using MbfApp.Dtos.AccountCodes
 
@@ -9,7 +9,7 @@
 <h5>Chart of Accounts</h5>
 <hr class="border-1 border-success opacity-50"/>
 <p>
-    <a href="accountcodes/create" class="btn btn-success btn-sm">
+    <a href="accounts/create" class="btn btn-success btn-sm">
         <i class="bi bi-plus-lg"></i>
         Create New
     </a>
@@ -18,12 +18,12 @@
 <div class="card rounded-2 overflow-hidden">
     <div class="card-body p-0 m-0">
         <QuickGrid Class="table " Items="accountcodes.AsQueryable()">
-            <PropertyColumn Property="accountcode => accountcode.Name"  Title="Account Name"/>
+            <PropertyColumn Property="accountcode => accountcode.AccountName"  Title="Account Name"/>
             <PropertyColumn Property="accountcode => accountcode.AccountType" Title="Account Type" />         
 
             <TemplateColumn Context="account" Title="Action">
-                <a href="@($"accountcodes/edit?id={account.Id}")" class="link-success icon-link "><i class="bi bi-pencil"></i></a>  |
-                <a href="@($"accountcodes/delete?id={account.Id}")" class="link-danger icon-link"><i class="bi bi-trash"></i></a>
+                <a href="@($"accounts/edit?id={account.Id}")" class="link-success icon-link "><i class="bi bi-pencil"></i></a>  |
+                <a href="@($"accounts/delete?id={account.Id}")" class="link-danger icon-link"><i class="bi bi-trash"></i></a>
             </TemplateColumn>
         </QuickGrid>
     </div>

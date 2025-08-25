@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace MbfApp.Tests.Services;
+namespace MbfApp.Tests.Unit.Services;
 
 public class MemberServiceTests
 {

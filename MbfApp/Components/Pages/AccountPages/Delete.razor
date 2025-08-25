@@ -1,4 +1,4 @@
-﻿@page "/accountcodes/delete"
+﻿@page "/accounts/delete"
 
 @using MbfApp.Dtos.AccountCodes
 @inject NavigationManager NavigationManager
@@ -34,7 +34,7 @@
             <div class="border rounded-2 bg-light p-3 mb-3">
                 <dl class="row mb-2">
                     <dt class="col-sm-4 text-secondary small">Account Name</dt>
-                    <dd class="col-sm-8 text-dark small">@account.Name</dd>
+                    <dd class="col-sm-8 text-dark small">@account.AccountName</dd>
                 </dl>
 
                 <dl class="row mb-0">
@@ -46,7 +46,7 @@
             <EditForm method="post" Model="account" OnValidSubmit="DeleteAccountCode" FormName="delete" Enhance>
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-danger btn-sm px-4">Delete</button>
-                    <a href="/accountcodes" class="btn btn-outline-secondary btn-sm px-4">Cancel</a>
+                    <a href="/accounts" class="btn btn-outline-secondary btn-sm px-4">Cancel</a>
                 </div>
             </EditForm>
         </div>
@@ -76,7 +76,7 @@
         try 
         {
             await AccountService.DeleteAccount(Id);
-            NavigationManager.NavigateTo("/accountcodes");
+            NavigationManager.NavigateTo("/accounts");
         }
         catch (InvalidOperationException ex)
         {

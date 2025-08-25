@@ -5,7 +5,7 @@ using MbfApp.Dtos.AccountCodes;
 using MbfApp.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace MbfApp.Tests.Services;
+namespace MbfApp.Tests.Unit.Services;
 
 public class AccountServiceTests
 {
@@ -54,7 +54,7 @@ public class AccountServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(1, result.Id);
-        Assert.Equal("Test Account", result.Name);
+        Assert.Equal("Test Account", result.AccountName);
     }
 
     [Fact]
@@ -76,14 +76,14 @@ public class AccountServiceTests
     {
         // Arrange
         var context = GetInMemoryDbContext();
-        var request = new AccountRequestDto { Name = "Test Account", AccountType = AccountType.Asset };
+        var request = new AccountRequestDto { AccountName = "Test Account", AccountType = AccountType.Asset };
 
         // Act
         var service = new AccountService(context);
         await service.CreateNewAccountCode(request);
 
         // Assert
-        var account = await context.Accounts.SingleOrDefaultAsync(a => a.AccountLabel == request.Name);
+        var account = await context.Accounts.SingleOrDefaultAsync(a => a.AccountLabel == request.AccountName);
         Assert.NotNull(account);
         Assert.Equal("Test Account", account.AccountLabel);
     }
@@ -97,7 +97,7 @@ public class AccountServiceTests
         await context.SaveChangesAsync();
 
         var service = new AccountService(context);
-        var request = new AccountRequestDto { Name = "Existing Account", AccountType = AccountType.Asset };
+        var request = new AccountRequestDto { AccountName = "Existing Account", AccountType = AccountType.Asset };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -114,7 +114,7 @@ public class AccountServiceTests
         context.Accounts.Add(new Account { Id = 1, AccountLabel = "Old Name", AccountType = AccountType.Asset });
         await context.SaveChangesAsync();
 
-        var request = new AccountRequestDto { Name = "New Name", AccountType = AccountType.Liabilities };
+        var request = new AccountRequestDto { AccountName = "New Name", AccountType = AccountType.Liabilities };
         var service = new AccountService(context);
 
         // Act
@@ -134,7 +134,7 @@ public class AccountServiceTests
         var context = GetInMemoryDbContext();
 
         var service = new AccountService(context);
-        var request = new AccountRequestDto { Name = "New Name", AccountType = AccountType.Asset };
+        var request = new AccountRequestDto { AccountName = "New Name", AccountType = AccountType.Asset };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -153,7 +153,7 @@ public class AccountServiceTests
         await context.SaveChangesAsync();
 
         var service = new AccountService(context);
-        var request = new AccountRequestDto { Name = "Existing Name", AccountType = AccountType.Asset };
+        var request = new AccountRequestDto { AccountName = "Existing Name", AccountType = AccountType.Asset };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
