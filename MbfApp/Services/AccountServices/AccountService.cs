@@ -16,7 +16,7 @@ public class AccountService : IAccountService
     
     public async Task CreateNewAccountCode(AccountRequestDto request)
     {
-        var name = request.Name.Trim();
+        var name = request.AccountName.Trim();
 
         var exists = await _context.Set<Account>()
             .AnyAsync(a => a.AccountLabel.ToLower() == name.ToLower());
@@ -53,7 +53,7 @@ public class AccountService : IAccountService
             {
                 Id = a.Id,
                 AccountType = a.AccountType,
-                Name = a.AccountLabel
+                AccountName = a.AccountLabel
             }).FirstOrDefaultAsync();
             
         return accountCode;
@@ -66,7 +66,7 @@ public class AccountService : IAccountService
             {
                 Id = a.Id,
                 AccountType = a.AccountType,
-                Name = a.AccountLabel
+                AccountName = a.AccountLabel
             }).ToListAsync();
 
         return accountCodes;
@@ -79,7 +79,7 @@ public class AccountService : IAccountService
         if (accountCode == null)
             throw new InvalidOperationException("Account not found.");
 
-        var name = request.Name.Trim();
+        var name = request.AccountName.Trim();
 
         if (accountCode.AccountLabel.ToLower() != name.ToLower())
         {

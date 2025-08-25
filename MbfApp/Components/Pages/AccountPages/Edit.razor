@@ -1,4 +1,4 @@
-﻿@page "/accountcodes/edit"
+﻿@page "/accounts/edit"
 
 @using MbfApp.Dtos.AccountCodes
 @inject NavigationManager NavigationManager
@@ -33,10 +33,10 @@
                 <DataAnnotationsValidator />
 
                 <div class="mb-3">
-                    <label for="description" class="form-label small">Account Name:</label>
-                    <InputText id="description" @bind-Value="Request.Name" class="form-control form-control-sm"
+                    <label for="name" class="form-label small">Account Name</label>
+                    <InputText id="name" @bind-Value="Request.AccountName" class="form-control form-control-sm"
                         aria-required="true" />
-                    <ValidationMessage For="() => Request.Name" class="text-danger" />
+                    <ValidationMessage For="() => Request.AccountName" class="text-danger" />
                 </div>
 
                 <div class="mb-3">
@@ -50,7 +50,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-success btn-sm mb-2">Save</button>
-                <a href="/accountcodes" class="btn btn-secondary btn-sm mb-2">Back </a>
+                <a href="/accounts" class="btn btn-secondary btn-sm mb-2">Back </a>
             </EditForm>
         </div>
     </div>
@@ -76,7 +76,7 @@
 
         Request ??= new AccountRequestDto
         {
-            Name = accountCode!.Name,
+            AccountName = accountCode!.AccountName,
             AccountType = accountCode.AccountType
         };
     }
@@ -86,7 +86,7 @@
         try
         {
             await AccountService.UpdateAccount(Id, Request!);
-            NavigationManager.NavigateTo("/accountcodes");
+            NavigationManager.NavigateTo("/accounts");
         }
         catch (InvalidOperationException ex)
         {

@@ -4,7 +4,7 @@ using MbfApp.Dtos.Locations;
 using MbfApp.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace MbfApp.Tests.Services;
+namespace MbfApp.Tests.Unit.Services;
 
 public class LocationServiceTests
 {

@@ -1,4 +1,4 @@
-﻿@page "/accountcodes/create"
+﻿@page "/accounts/create"
 
 @using MbfApp.Dtos.AccountCodes
 
@@ -21,10 +21,10 @@
             <EditForm method="post" Model="Request" OnValidSubmit="AddAccountCode" FormName="create" Enhance>
                 <DataAnnotationsValidator />
                 <div class="mb-3">
-                    <label for="description" class="form-label small">Account Name</label>
-                    <InputText id="description" @bind-Value="Request.Name" class="form-control form-control-sm"
+                    <label for="name" class="form-label small">Account Name</label>
+                    <InputText id="name" @bind-Value="Request.AccountName" class="form-control form-control-sm"
                         aria-required="true" />
-                    <ValidationMessage For="() => Request.Name" class="text-danger" />
+                    <ValidationMessage For="() => Request.AccountName" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="type" class="form-label small">Account Type</label>
@@ -36,7 +36,7 @@
                     </InputSelect>
                 </div>
                 <button type="submit" class="btn btn-success btn-sm mb-2">Create</button>
-                <a href="/accountcodes" class="btn btn-secondary btn-sm mb-2">Back </a>
+                <a href="/accounts" class="btn btn-secondary btn-sm mb-2">Back </a>
             </EditForm>
         </div>
     </div>
@@ -55,7 +55,7 @@
         try 
         {
             await AccountService.CreateNewAccountCode(Request);
-            NavigationManager.NavigateTo("/accountcodes");
+            NavigationManager.NavigateTo("/accounts");
         }
         catch (InvalidOperationException ex)
         {
