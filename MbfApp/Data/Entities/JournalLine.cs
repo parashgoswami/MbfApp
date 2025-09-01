@@ -1,5 +1,4 @@
 ﻿namespace MbfApp.Data.Entities;
-
 public class JournalLine
 {
     public int Id { get; set; }

@@ -11,12 +11,12 @@
 @inject IdentityRedirectManager RedirectManager
 
 <PageTitle>Log in</PageTitle>
-<div class="row">
-    <div class="col-lg-4">
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-5">
         <section>
-            <div class="card rounded-2 overflow-hidden p-4">
-                <h5>Login</h5>
-                <hr class="border border-success border-1 opacity-50 py-0">
+           @*  <div class="card rounded-2 overflow-hidden p-4"> *@
+                <h4 class="mb-4">Login</h4>
+              @*   <hr class="border border-success border-1 opacity-50 py-0"> *@
                 <StatusMessage Message="@errorMessage" />
                 <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                     <DataAnnotationsValidator />
@@ -32,18 +32,18 @@
                         <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control  form-control-sm" autocomplete="current-password" aria-required="true" placeholder="password" />
                         <ValidationMessage For="() => Input.Password" class="text-danger" />
                     </div>
-                    <div class="checkbox mb-3">
+                   @*  <div class="checkbox mb-3">
                         <label class="form-label">
-                            <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
+                            <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input small" />
                             Remember me
                         </label>
-                    </div>
+                    </div> *@
                     <div>
                         <button type="submit" class="w-100 btn btn-sm btn-success">Log in</button>
                     </div>
                     <div>
                         <p>
-                            <NavLink href="Account/ForgotPassword">Forgot your password?</NavLink>
+                        <NavLink href="Account/ForgotPassword" class="form-label small text-muted">Forgot your password?</NavLink>
                         </p>
                         @* <p>
                             <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
@@ -53,7 +53,7 @@
                         </p> *@
                     </div>
                 </EditForm>
-            </div>
+           @*  </div> *@
         </section>
     </div>
     <div class="col-lg-4 col-lg-offset-2">

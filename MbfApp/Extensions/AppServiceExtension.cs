@@ -1,4 +1,5 @@
 ﻿using MbfApp.Services;
+using MbfApp.Services.VoucherNoService;
 
 namespace MbfApp.Extensions;
 
@@ -11,6 +12,9 @@ public static class AppServiceExtension
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ILocationService, LocationService>();
         services.AddScoped<IMemberLedgerService, MemberLedgerService>();
+        services.AddScoped<ICreateMemberService,CreateMemberService>();
+        services.AddScoped<IFinYearService, FinYearService>();
+        services.AddScoped<IVoucherNumberService, VoucherNumberService>();
 
         return services;
     }

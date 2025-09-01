@@ -16,6 +16,7 @@
 </div>
 
 <InputFile OnChange="HandleFileSelected" accept=".csv" />
+<input type="text" class="form-control mt-2" placeholder="narration" value="@Narration" required />
 <button class="btn btn-primary mt-2" @onclick="UploadFile" disabled="@(!IsFileSelected)">
     Upload
 </button>
@@ -24,7 +25,7 @@
     private IBrowserFile? selectedFile;
     private bool IsFileSelected => selectedFile != null;
     private string? StatusMessage;
-
+    private string Narration = string.Empty;
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
         selectedFile = e.File;
@@ -42,7 +43,7 @@
         try
         {
             using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB max
-            await MemberLedgerService.ImportFromCsvAsync(stream);
+            await MemberLedgerService.ImportFromCsvAsync(stream,Narration);
             StatusMessage = "CSV uploaded and processed successfully!";
             selectedFile = null;
         }

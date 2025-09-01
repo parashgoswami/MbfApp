@@ -3,6 +3,7 @@ using System;
 using MbfApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MbfApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250826183938_MemberLedgerBalance")]
+    partial class MemberLedgerBalance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,9 +142,6 @@ namespace MbfApp.Data.Migrations
                         .HasColumnType("real");
 
                     b.Property<bool>("IsClosed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsCurrent")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("StartDate")
@@ -395,29 +395,6 @@ namespace MbfApp.Data.Migrations
                     b.HasIndex("MemberId");
 
                     b.ToTable("MemberLedgerBalances");
-                });
-
-            modelBuilder.Entity("MbfApp.Data.Entities.VoucherSequence", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FinancialYear")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("LastNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("VoucherSequences");
                 });
 
             modelBuilder.Entity("MbfApp.Data.Entities.Withdrawal", b =>

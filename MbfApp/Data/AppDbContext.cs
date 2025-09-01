@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Location> Locations { get; set; }
+    public DbSet<VoucherSequence> VoucherSequences { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<FinYear> FinYears { get; set; }
     public DbSet<Account> AccountBalances { get; set; }

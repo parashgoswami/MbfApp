@@ -202,7 +202,8 @@ public static class AppDbSeed
                         EndDate = new DateTime(2025, 3, 31, 0, 0, 0, DateTimeKind.Utc),
                         IntDeposit = 7.50f,
                         IntLoan = 8.50f,
-                        IsClosed = true
+                        IsClosed = true,
+                        IsCurrent = false
                     },
 
                 };

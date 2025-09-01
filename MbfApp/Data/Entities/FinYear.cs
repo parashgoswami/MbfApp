@@ -9,4 +9,5 @@ public class FinYear
     public float IntDeposit { get; set; }
     public float IntLoan { get; set; }
     public bool IsClosed { get; set; } = false;
+    public bool IsCurrent { get; set; } = true;
 }

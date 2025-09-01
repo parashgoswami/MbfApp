@@ -41,7 +41,6 @@ public class MemberService(UserManager<ApplicationUser> userManager, AppDbContex
             MemberId = member.Id,
             PhoneNumber = member.Phone
         };
-
         var result = await userManager.CreateAsync(appUser, "Welcome@123");
         if (result.Succeeded)
         {
@@ -83,9 +82,7 @@ public class MemberService(UserManager<ApplicationUser> userManager, AppDbContex
                 m.LastName.ToLower().Contains(searchTerm) ||
                 m.EmployeeNo.ToLower().Contains(searchTerm));
         }
-
-        query = query.OrderBy(m => m.FirstName);
-
+        query = query.OrderBy(m => m.Id);
         return await PaginatedList<MemberDto>.CreateAsync(query.AsNoTracking(), searchParams.PageIndex, searchParams.PageSize);
     }
 
@@ -114,9 +111,7 @@ public class MemberService(UserManager<ApplicationUser> userManager, AppDbContex
 
     public async Task UpdateMember(int id, MemberRequestDto request)
     {
-
         var member = await context.Members.FindAsync(id);
-
         if (member == null)
             throw new InvalidOperationException("Member not found.");
 

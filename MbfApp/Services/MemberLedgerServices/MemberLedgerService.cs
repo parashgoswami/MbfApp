@@ -2,6 +2,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using MbfApp.Data;
 using MbfApp.Data.Entities;
+using MbfApp.Services.VoucherNoService;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -9,13 +10,16 @@ namespace MbfApp.Services;
 public class MemberLedgerService : IMemberLedgerService
 {
     private readonly AppDbContext _context;
-
-    public MemberLedgerService(AppDbContext context)
+    private readonly IVoucherNumberService _voucherService;
+    private readonly IFinYearService _finYearService;
+    public MemberLedgerService(AppDbContext context, IVoucherNumberService voucherNumberService, IFinYearService finYearService)
     {
         _context = context;
+        _voucherService = voucherNumberService;
+        _finYearService = finYearService;
     }
 
-    public async Task ImportFromCsvAsync(Stream csvStream)
+    public async Task ImportFromCsvAsync(Stream csvStream, string narration)
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
@@ -32,34 +36,75 @@ public class MemberLedgerService : IMemberLedgerService
 
 
         var records = new List<MemberLedger>();
-
+        var totalDepositCr = 0m;
+        var totalLoanCr = 0m;
         await foreach (var record in csv.GetRecordsAsync<MemberLedger>())
         {
             records.Add(record);
         }
-
-        foreach (var record in records)
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
         {
-            // Ensure EmpCode + YearMonth is unique
-            bool exists = await _context.MemberLedgers
-                .AnyAsync(m => m.EmpCode == record.EmpCode && m.YearMonth == record.YearMonth);
+            foreach (var record in records)
+            {
+                // Ensure EmpCode + YearMonth is unique
+                bool exists = await _context.MemberLedgers
+                    .AnyAsync(m => m.EmpCode == record.EmpCode && m.YearMonth == record.YearMonth);
 
-            if (!exists)
-            {
-                _context.MemberLedgers.Add(record);
+                if (!exists)
+                {
+                    _context.MemberLedgers.Add(record);
+                }
+                else
+                {
+                    var existing = await _context.MemberLedgers.FirstAsync(m => m.EmpCode == record.EmpCode && m.YearMonth == record.YearMonth);
+
+                    existing.DepositCr = record.DepositCr;
+                    existing.LoanCr = record.LoanCr;
+                }
+                totalDepositCr += record.DepositCr;
+                totalLoanCr += record.LoanCr;
             }
-            else
+            var finYear = await _finYearService.getCurrentFinYear();
+            var journal = new Journal
             {
-                var existing = await _context.MemberLedgers.FirstAsync(m => m.EmpCode == record.EmpCode && m.YearMonth == record.YearMonth);
-                //existing.DepositDr = record.DepositDr;
-                existing.DepositCr = record.DepositCr;
-               // existing.IntDeposit = record.IntDeposit;
-               // existing.LoanDr = record.LoanDr;
-                existing.LoanCr = record.LoanCr;
-                //existing.IntLoan = record.IntLoan;
+                JvNo = await _voucherService.GetNextVoucherNumberAsync(),
+                FinYearId = finYear.Id,
+                JournalDate = DateTime.UtcNow,
+                Narration = narration.Trim(),
+                Lines = new List<JournalLine>
+            {
+                new JournalLine
+                {
+                    AccountId = 1, // Deposit Account Id
+                    DbAmt = 0,
+                    CrAmt = totalDepositCr,
+                    Note = "Total Deposit Cr from CSV"
+                },
+                new JournalLine
+                {
+                    AccountId = 2, // Loan Account Id
+                    DbAmt = 0,
+                    CrAmt = totalLoanCr,
+                    Note = "Total Loan Cr from CSV"
+                },
+                new JournalLine
+                {
+                    AccountId = 3, // Cash/Bank Account Id
+                    CrAmt = 0,
+                    DbAmt = totalDepositCr + totalLoanCr,
+                    Note = "Total Bank Cr from CSV"
+                }
             }
+            };
+            _context.Journals.Add(journal);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
-
-        await _context.SaveChangesAsync();
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }

@@ -4,7 +4,7 @@
 @using MbfApp.Dtos.Member
 
 @inject ILocationService LocationService
-@inject IMemberService MemberService
+@inject ICreateMemberService CreateMemberService
 @inject NavigationManager NavigationManager
 
 <div class="row justify-content-center">
@@ -115,7 +115,7 @@
     {
         try 
         {
-            await MemberService.CreateMember(Member);
+            await CreateMemberService.CreateMember(Member);
             NavigationManager.NavigateTo("/members");
         }
         catch (InvalidOperationException ex)
