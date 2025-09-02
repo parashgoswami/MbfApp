@@ -22,11 +22,6 @@ public static class ServiceCollectionExtensions
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         db.Database.Migrate();
-
-        // await AppDbSeed.SeedAdminUserAsync(sp);
-        // await AppDbSeed.SeedAccountAsync(sp);
-        // await AppDbSeed.SeedLocationAsync(sp);
-        // await AppDbSeed.SeedMembersAsync(sp);
     }
 }
 

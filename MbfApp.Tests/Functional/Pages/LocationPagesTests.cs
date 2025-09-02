@@ -19,6 +19,33 @@ public class LocationPagesTests : BlazorPageTest
     protected override string ConnectionString => _fixture.ConnectionString;
 
     [Fact]
+    public async Task Locations_Index_Displays_Locations()
+    {
+        // Arrange
+        var locationsToSeed = new List<string> { "Location A", "Location B", "Location C" };
+
+        await using var scope = Host.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var locations = context.Locations.ToList();
+
+        foreach (var locationName in locationsToSeed)
+        {
+            context.Locations.Add(new Location { Name = locationName });
+        }
+        await context.SaveChangesAsync();
+
+        // Act
+        await Page.GotoBlazorServerPageAsync("/locations");
+
+        // Assert
+        foreach (var locationName in locationsToSeed)
+        {
+            await Assertions.Expect(Page.GetByRole(AriaRole.Cell, new() { Name = locationName })).ToBeVisibleAsync();
+        }
+    }
+
+    [Fact]
     public async Task Location_Create_Works()
     {
         await Page.GotoBlazorServerPageAsync("locations/create");
@@ -56,30 +83,5 @@ public class LocationPagesTests : BlazorPageTest
         // Assert
         await Assertions.Expect(Page.GetByRole(AriaRole.Cell, new() { Name = updatedLocationName })).ToBeVisibleAsync();
         await Assertions.Expect(Page.GetByText(initialLocationName)).Not.ToBeVisibleAsync();
-    }
-
-    [Fact]
-    public async Task Locations_Index_Displays_Locations()
-    {
-        // Arrange
-        var locationsToSeed = new List<string> { "Location A", "Location B", "Location C" };
-
-        await using var scope = Host.Services.CreateAsyncScope();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        foreach (var locationName in locationsToSeed)
-        {
-            context.Locations.Add(new Location { Name = locationName });
-        }
-        await context.SaveChangesAsync();
-
-        // Act
-        await Page.GotoBlazorServerPageAsync("/locations");
-
-        // Assert
-        foreach (var locationName in locationsToSeed)
-        {
-            await Assertions.Expect(Page.GetByRole(AriaRole.Cell, new() { Name = locationName })).ToBeVisibleAsync();
-        }
     }
 }

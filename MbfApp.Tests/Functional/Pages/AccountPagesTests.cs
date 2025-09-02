@@ -20,6 +20,31 @@ public class AccountPagesTests : BlazorPageTest
     protected override string ConnectionString => _fixture.ConnectionString;
 
     [Fact]
+    public async Task Accounts_Index_Displays_Accounts()
+    {
+        // Arrange
+        var accountsToSeed = new List<string> { "Account A", "Account B", "Account C" };
+
+        await using var scope = Host.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        foreach (var accountLabel in accountsToSeed)
+        {
+            context.Accounts.Add(new Account { AccountLabel = accountLabel, AccountType = AccountType.Asset });
+        }
+        await context.SaveChangesAsync();
+
+        // Act
+        await Page.GotoBlazorServerPageAsync("/accounts");
+
+        // Assert
+        foreach (var accountLabel in accountsToSeed)
+        {
+            await Assertions.Expect(Page.GetByRole(AriaRole.Cell, new() { Name = accountLabel })).ToBeVisibleAsync();
+        }
+    }
+    
+    [Fact]
     public async Task Account_Create_Works()
     {
         await Page.GotoBlazorServerPageAsync("accounts/create");
@@ -58,30 +83,5 @@ public class AccountPagesTests : BlazorPageTest
         // Assert
         await Assertions.Expect(Page.GetByRole(AriaRole.Cell, new() { Name = updatedAccountName })).ToBeVisibleAsync();
         await Assertions.Expect(Page.GetByText(initialAccountName)).Not.ToBeVisibleAsync();
-    }
-
-    [Fact]
-    public async Task Accounts_Index_Displays_Accounts()
-    {
-        // Arrange
-        var accountsToSeed = new List<string> { "Account A", "Account B", "Account C" };
-
-        await using var scope = Host.Services.CreateAsyncScope();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        foreach (var accountLabel in accountsToSeed)
-        {
-            context.Accounts.Add(new Account { AccountLabel = accountLabel, AccountType = AccountType.Asset });
-        }
-        await context.SaveChangesAsync();
-
-        // Act
-        await Page.GotoBlazorServerPageAsync("/accounts");
-
-        // Assert
-        foreach (var accountLabel in accountsToSeed)
-        {
-            await Assertions.Expect(Page.GetByRole(AriaRole.Cell, new() { Name = accountLabel })).ToBeVisibleAsync();
-        }
-    }
+    }    
 }

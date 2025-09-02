@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MbfApp.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -79,7 +79,8 @@ namespace MbfApp.Data.Migrations
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IntDeposit = table.Column<float>(type: "real", nullable: false),
                     IntLoan = table.Column<float>(type: "real", nullable: false),
-                    IsClosed = table.Column<bool>(type: "boolean", nullable: false)
+                    IsClosed = table.Column<bool>(type: "boolean", nullable: false),
+                    IsCurrent = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,6 +118,21 @@ namespace MbfApp.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MemberLedgers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VoucherSequences",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FinancialYear = table.Column<string>(type: "text", nullable: false),
+                    LastNumber = table.Column<int>(type: "integer", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VoucherSequences", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -325,6 +341,36 @@ namespace MbfApp.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MemberLedgerBalances",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FinYearId = table.Column<int>(type: "integer", nullable: false),
+                    MemberId = table.Column<int>(type: "integer", nullable: false),
+                    OpBalDeposit = table.Column<decimal>(type: "numeric", nullable: false),
+                    OpBalLoan = table.Column<decimal>(type: "numeric", nullable: false),
+                    DepositBalance = table.Column<decimal>(type: "numeric", nullable: false),
+                    LoanBalance = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MemberLedgerBalances", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MemberLedgerBalances_FinYears_FinYearId",
+                        column: x => x.FinYearId,
+                        principalTable: "FinYears",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MemberLedgerBalances_Members_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Members",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Withdrawals",
                 columns: table => new
                 {
@@ -402,6 +448,16 @@ namespace MbfApp.Data.Migrations
                 column: "MemberId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MemberLedgerBalances_FinYearId",
+                table: "MemberLedgerBalances",
+                column: "FinYearId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MemberLedgerBalances_MemberId",
+                table: "MemberLedgerBalances",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Members_LocationId",
                 table: "Members",
                 column: "LocationId");
@@ -440,7 +496,13 @@ namespace MbfApp.Data.Migrations
                 name: "Loans");
 
             migrationBuilder.DropTable(
+                name: "MemberLedgerBalances");
+
+            migrationBuilder.DropTable(
                 name: "MemberLedgers");
+
+            migrationBuilder.DropTable(
+                name: "VoucherSequences");
 
             migrationBuilder.DropTable(
                 name: "Withdrawals");

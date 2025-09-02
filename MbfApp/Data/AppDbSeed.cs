@@ -73,31 +73,37 @@ public static class AppDbSeed
                 {
                     new Account
                     {
+                        Id = EntityConstants.BankAccountId,
                         AccountLabel = "Bank A/c",
                         AccountType = AccountType.Asset
                     },
                     new Account
                     {
+                        Id = EntityConstants.CashAccountId,
                         AccountType = AccountType.Asset,
                         AccountLabel = "Cash A/c"
                     } ,
                     new Account
                     {
+                        Id = EntityConstants.LoanAccountId,
                         AccountType = AccountType.Asset,
                         AccountLabel = "Loan A/c"
                     } ,
                     new Account
                     {
+                        Id = EntityConstants.DepositAccountId,
                         AccountType = AccountType.Liabilities,
                         AccountLabel = "Deposit A/c"
                     } ,
                     new Account
                     {
+                        Id = EntityConstants.DepositInterestAccountId,
                         AccountType = AccountType.Liabilities,
                         AccountLabel = "Int. On Deposit A/c"
                     } ,
                     new Account
                     {
+                        Id = EntityConstants.LoanInterestAccountId,
                         AccountType = AccountType.Income,
                         AccountLabel = "Int. On Loan A/c"
                     } ,

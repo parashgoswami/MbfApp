@@ -54,7 +54,7 @@
     {
         try 
         {
-            await AccountService.CreateNewAccountCode(Request);
+            await AccountService.CreateNewAccount(Request);
             NavigationManager.NavigateTo("/accounts");
         }
         catch (InvalidOperationException ex)

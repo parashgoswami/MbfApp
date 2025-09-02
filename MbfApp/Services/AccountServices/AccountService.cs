@@ -14,7 +14,7 @@ public class AccountService : IAccountService
         _context = context;
     }
     
-    public async Task CreateNewAccountCode(AccountRequestDto request)
+    public async Task CreateNewAccount(AccountRequestDto request)
     {
         var name = request.AccountName.Trim();
 

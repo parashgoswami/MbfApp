@@ -80,7 +80,7 @@ public class AccountServiceTests
 
         // Act
         var service = new AccountService(context);
-        await service.CreateNewAccountCode(request);
+        await service.CreateNewAccount(request);
 
         // Assert
         var account = await context.Accounts.SingleOrDefaultAsync(a => a.AccountLabel == request.AccountName);
@@ -101,7 +101,7 @@ public class AccountServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            service.CreateNewAccountCode(request));
+            service.CreateNewAccount(request));
         Assert.Equal("Account name must be unique.", exception.Message);
     }   
 

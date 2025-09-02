@@ -1,71 +1,163 @@
 ﻿@page "/upload-ledger"
 
-@using System.Text
+@using MbfApp.Dtos.MemberLedgers
+@using MbfApp.Utils
+
 @inject IMemberLedgerService MemberLedgerService
+@inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
 
-<h3>Upload Member Ledger CSV</h3>
+<PageTitle>Member Ledger Upload</PageTitle>
 
-@if (!string.IsNullOrEmpty(StatusMessage))
-{
-    <div class="alert alert-info">@StatusMessage</div>
-}
+<div class="row">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Upload Member Ledger CSV</h5>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(StatusMessage))
+                {
+                    <div class="alert @StatusMessageClass" role="alert">
+                        @StatusMessage
+                    </div>
+                }
 
-<div class="mb-3">
-    <button class="btn btn-secondary" @onclick="DownloadTemplate">Download CSV Template</button>
+                <div class="mb-3">
+                    <label for="narration" class="form-label">Narration</label>
+                    <input type="text" id="narration" class="form-control" @bind="Narration" @bind:event="oninput" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="file-upload" class="form-label">CSV File</label>
+                    <InputFile id="file-upload" OnChange="HandleFileSelected" class="form-control" accept=".csv" />
+                    <div class="form-text">Select the CSV file containing member ledger data.</div>
+                </div>
+
+                <div class="mt-3">
+                    <p class="form-text">
+                        Don't have a template?
+                        <a @onclick="DownloadTemplate" class="link-primary" style="cursor: pointer;">Download the CSV
+                            template here.</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-footer bg-light d-flex justify-content-end">
+                <button class="btn btn-success" @onclick="UploadFile"
+                    disabled="@(isLoading || selectedFile == null || string.IsNullOrWhiteSpace(Narration))">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="visually-hidden">Loading...</span>
+                        <span>Uploading...</span>
+                    }
+                    else
+                    {
+                        <span>Upload File</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
-
-<InputFile OnChange="HandleFileSelected" accept=".csv" />
-<input type="text" class="form-control mt-2" placeholder="narration" value="@Narration" required />
-<button class="btn btn-primary mt-2" @onclick="UploadFile" disabled="@(!IsFileSelected)">
-    Upload
-</button>
 
 @code {
     private IBrowserFile? selectedFile;
-    private bool IsFileSelected => selectedFile != null;
+    private bool isLoading;
     private string? StatusMessage;
+    private string StatusMessageClass => isError ? "alert-danger" : "alert-success";
+    private bool isError;
     private string Narration = string.Empty;
+    private readonly int MaxFileSize = 10 * 1024 * 1024; // 10MB
+
+    private List<MemberLedgerErrorDto>? Errors;
+
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
         selectedFile = e.File;
         StatusMessage = null;
+        isError = false;
     }
 
     private async Task UploadFile()
     {
-        if (selectedFile == null)
+        if (selectedFile == null || string.IsNullOrWhiteSpace(Narration))
         {
-            StatusMessage = "Please select a file first.";
+            StatusMessage = "Please select a file and provide a narration.";
+            isError = true;
             return;
         }
 
+        if (selectedFile.Size > MaxFileSize)
+        {
+            StatusMessage = "The file size exceeds the 10 MB limit.";
+            isError = true;
+            return;
+        }
+
+        isLoading = true;
+        StatusMessage = null;
+        isError = false;
+
         try
         {
-            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB max
-            await MemberLedgerService.ImportFromCsvAsync(stream,Narration);
+            using var stream = selectedFile.OpenReadStream();
+            await MemberLedgerService.ImportFromCsvAsync(stream, Narration);
+
             StatusMessage = "CSV uploaded and processed successfully!";
-            selectedFile = null;
+            selectedFile = null; // Clear the file input
+            Narration = string.Empty; // Clear the narration
         }
-        catch (Exception ex)
+        catch (MemberLedgerException ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            isError = true;
+            StatusMessage = ex.Message;
+            Errors = ex.Errors;
+
+            if (Errors is not null)
+            {
+                await DownloadErrorTemplate(Errors);
+            }
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
     private async Task DownloadTemplate()
     {
-        // var csvContent = "EmpCode,YearMonth,DepositDr,DepositCr,IntDeposit,LoanDr,LoanCr,IntLoan\n" +
-        //                  "EMP001,202501,0,0,0,0,0,0\n";
-
-        var csvContent = "EmpCode,YearMonth,Deposit(Cr),Loan(Cr)\n";
+        var csvContent = "EmpCode,YearMonth,DepositCr,LoanCr\n";
 
         var bytes = Encoding.UTF8.GetBytes(csvContent);
         var base64 = Convert.ToBase64String(bytes);
         var fileName = "MemberLedgerTemplate.csv";
 
-        await JS.InvokeVoidAsync("downloadFile", fileName, base64);
+        await JsRuntime.InvokeVoidAsync("downloadFile", fileName, base64);
     }
 
-    [Inject] private IJSRuntime JS { get; set; } = default!;
+    private async Task DownloadErrorTemplate(List<MemberLedgerErrorDto> errors)
+    {
+        var csvContent = "EmpCode,YearMonth,DepositCr,LoanCr,Error\n";
+
+        foreach (var error in errors)
+        {
+            var errorLine = string.Join(",",
+            CsvUtility.EscapeCsv(error.EmpCode),
+            CsvUtility.EscapeCsv(error.YearMonth),
+            CsvUtility.EscapeCsv(error.DepositCr),
+            CsvUtility.EscapeCsv(error.LoanCr),
+            CsvUtility.EscapeCsv(error.Error)
+            );
+
+            csvContent += errorLine + "\n";
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(csvContent);
+        var base64 = Convert.ToBase64String(bytes);
+        var fileName = "MemberLedgerError.csv";
+
+        await JsRuntime.InvokeVoidAsync("downloadFile", fileName, base64);
+    }
 }

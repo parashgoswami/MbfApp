@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MbfApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250827151303_FinYearModified")]
-    partial class FinYearModified
+    [Migration("20250902124429_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -398,6 +398,29 @@ namespace MbfApp.Data.Migrations
                     b.HasIndex("MemberId");
 
                     b.ToTable("MemberLedgerBalances");
+                });
+
+            modelBuilder.Entity("MbfApp.Data.Entities.VoucherSequence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FinancialYear")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("LastNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VoucherSequences");
                 });
 
             modelBuilder.Entity("MbfApp.Data.Entities.Withdrawal", b =>
