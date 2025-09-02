@@ -1,4 +1,7 @@
+using MbfApp.Data;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit;
@@ -23,7 +26,7 @@ public abstract class BlazorPageTest : BrowserTest
 
     public override async Task InitializeAsync()
     {
-        if(ConnectionString.IsNullOrEmpty())
+        if (ConnectionString.IsNullOrEmpty())
             throw new InvalidOperationException("DB connection string not set.");
 
         host = new BlazorAppFactory(ConnectionString, ConfigureWebHost);

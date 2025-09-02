@@ -6,7 +6,7 @@ public class EmployeeCodeAttribute : ValidationAttribute
 {
     public EmployeeCodeAttribute()
     {
-        ErrorMessage = "The field must be exactly 4 digits.";
+        ErrorMessage = "The employee code must be exactly 4 digits.";
     }
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)

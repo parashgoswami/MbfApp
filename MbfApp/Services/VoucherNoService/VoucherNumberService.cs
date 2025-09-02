@@ -2,7 +2,7 @@
 using MbfApp.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace MbfApp.Services.VoucherNoService;
+namespace MbfApp.Services;
 public interface IVoucherNumberService
 {
     Task<string> GetNextVoucherNumberAsync();
@@ -18,6 +18,7 @@ public class VoucherNumberService : IVoucherNumberService
     public async Task<string> GetNextVoucherNumberAsync()
     {
         var fy = FinancialYearHelper.GetFinancialYear(DateTime.Now);
+        
         var sequence = await _context.VoucherSequences
            .SingleOrDefaultAsync(v => v.FinancialYear == fy);
 
@@ -39,6 +40,6 @@ public class VoucherNumberService : IVoucherNumberService
 
         await _context.SaveChangesAsync();
 
-        return $"{fy}-{sequence.LastNumber:D4}";
+        return $"{fy}{sequence.LastNumber:D4}";
     }
 }

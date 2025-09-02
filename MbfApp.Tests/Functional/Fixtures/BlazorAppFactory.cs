@@ -66,6 +66,8 @@ public sealed class BlazorAppFactory(
                 {
                     options.UseNpgsql(connectionString);
                 });
+
+                services.EnsureCreated<AppDbContext>();
             });
         });
 
